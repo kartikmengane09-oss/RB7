@@ -56,8 +56,12 @@ export default function RB7DriftWall({ sectionRef }) {
     return Array.from({ length: columns }, (_, index) => {
       const offset = index - center
       const normalized = center ? offset / center : 0
-      const turn = normalized * (isMobile ? 18 : 22)
-      const depth = Math.max(0, 115 - Math.abs(normalized) * 70)
+      // Larger cylinder radius: the side columns travel farther around the
+      // viewer, creating more separation without shrinking the six tiles.
+      const turn = normalized * (isMobile ? 24 : 22)
+      const depth = isMobile
+        ? 190 - Math.abs(normalized) * 30
+        : Math.max(0, 115 - Math.abs(normalized) * 70)
       return {
         '--dw-col-turn': `${turn}deg`,
         '--dw-col-depth': `${depth}px`,
