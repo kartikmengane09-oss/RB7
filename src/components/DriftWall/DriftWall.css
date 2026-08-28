@@ -109,14 +109,14 @@
   box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.9);
 }
 
-/* Mobile uses six larger columns with deliberate spacing. */
+/* Mobile: six columns with wider, intentional gaps. */
 @media (max-width: 767px) {
   .drift-wall {
     --dw-edge: 100%;
     --dw-dim: 0.9;
     --dw-perspective: 900px;
-    --dw-gap: 14px;
-    --dw-tile-w: clamp(52px, calc((100vw - 84px) / 6), 62px);
+    --dw-gap: 22px;
+    --dw-tile-w: clamp(46px, calc((100vw - 132px) / 6), 56px);
     --dw-tile-h: calc(var(--dw-tile-w) * 0.69);
     --dw-radius: 8px;
     -webkit-mask-image: none;
@@ -149,8 +149,8 @@
 
 @media (max-width: 390px) {
   .drift-wall {
-    --dw-gap: 11px;
-    --dw-tile-w: clamp(48px, calc((100vw - 66px) / 6), 56px);
+    --dw-gap: 18px;
+    --dw-tile-w: clamp(44px, calc((100vw - 108px) / 6), 52px);
   }
 }
 
