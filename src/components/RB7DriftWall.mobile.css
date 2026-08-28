@@ -1,4 +1,5 @@
-/* Mobile/tablet tuning for the full-screen 9-column DriftWall. */
+/* Responsive DriftWall sizing. The wall keeps all 9 columns, but scales the
+   tile geometry so the composition remains visible on narrow screens. */
 .drift-wall-section {
   position: relative;
   width: 100%;
@@ -18,47 +19,46 @@
 
 @media (max-width: 1100px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: 160px;
-    --dw-tile-h: 106px;
-    --dw-gap: 12px;
+    --dw-tile-w: 145px;
+    --dw-tile-h: 96px;
+    --dw-gap: 8px;
+    --dw-perspective: 1000px;
   }
 }
 
 @media (max-width: 767px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: 100px;
-    --dw-tile-h: 66px;
-    --dw-gap: 9px;
-    --dw-radius: 9px;
+    --dw-tile-w: clamp(48px, 13vw, 58px);
+    --dw-tile-h: clamp(32px, 8.5vw, 39px);
+    --dw-gap: clamp(4px, 1.2vw, 6px);
+    --dw-radius: 5px;
     --dw-perspective: 900px;
-    --dw-lift: 32px;
+    --dw-lift: 28px;
+  }
+
+  .drift-wall-stage .drift-wall__plane {
+    transform: translate(-50%, -50%) scale(1) translateZ(-70px) !important;
+  }
+
+  .drift-wall-stage .drift-wall__inner {
+    opacity: 0.86;
+  }
+
+  .drift-wall-stage .drift-wall__overlay {
+    opacity: 0.28;
   }
 }
 
 @media (max-width: 390px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: 92px;
-    --dw-tile-h: 61px;
-    --dw-gap: 8px;
-  }
-}
-
-@media (max-width: 767px) {
-  .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1.04) translateZ(-90px) !important;
-  }
-
-  .drift-wall-stage .drift-wall__inner {
-    opacity: 0.82;
-  }
-
-  .drift-wall-stage .drift-wall__overlay {
-    opacity: 0.3;
+    --dw-tile-w: 47px;
+    --dw-tile-h: 31px;
+    --dw-gap: 4px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1.04) !important;
+    transform: translate(-50%, -50%) scale(1) translateZ(-70px) !important;
   }
 }
