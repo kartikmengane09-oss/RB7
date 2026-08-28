@@ -27,10 +27,9 @@
 
 @media (max-width: 767px) {
   .drift-wall-stage .drift-wall {
-    /* Six columns. Images are another 15% larger than the previous mobile
-       size; the cylindrical footprint can overflow slightly at the edges. */
-    --dw-tile-w: clamp(86px, 22.4vw, 102px) !important;
-    --dw-tile-h: clamp(58px, 16.2vw, 70px) !important;
+    /* Mobile-only sizing. DriftWall itself remains unchanged on desktop. */
+    --dw-tile-w: clamp(100px, 25.8vw, 118px) !important;
+    --dw-tile-h: clamp(67px, 18.6vw, 81px) !important;
     --dw-gap: 4px !important;
     --dw-radius: 7px !important;
     --dw-perspective: 760px !important;
@@ -40,56 +39,31 @@
     mask-image: none !important;
   }
 
-  /* The cylinder radius is supplied by RB7DriftWall.jsx as a viewport-aware
-     value. Each column uses that geometry rather than a fixed mobile radius. */
   .drift-wall-stage .drift-wall__col {
     transform-style: preserve-3d;
     transform-origin: 50% 50%;
   }
 
-  .drift-wall-stage .drift-wall__col:nth-child(1) {
-    transform: rotateY(-25deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.094)) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(2) {
-    transform: rotateY(-15deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.034)) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(3) {
-    transform: rotateY(-5deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.004)) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(4) {
-    transform: rotateY(5deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.004)) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(5) {
-    transform: rotateY(15deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.034)) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(6) {
-    transform: rotateY(25deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.094)) !important;
-  }
+  .drift-wall-stage .drift-wall__col:nth-child(1) { transform: rotateY(-25deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.094)) !important; }
+  .drift-wall-stage .drift-wall__col:nth-child(2) { transform: rotateY(-15deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.034)) !important; }
+  .drift-wall-stage .drift-wall__col:nth-child(3) { transform: rotateY(-5deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.004)) !important; }
+  .drift-wall-stage .drift-wall__col:nth-child(4) { transform: rotateY(5deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.004)) !important; }
+  .drift-wall-stage .drift-wall__col:nth-child(5) { transform: rotateY(15deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.034)) !important; }
+  .drift-wall-stage .drift-wall__col:nth-child(6) { transform: rotateY(25deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.094)) !important; }
 
-  .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1, 1.35) translateZ(-35px) !important;
-  }
-
-  .drift-wall-stage .drift-wall__inner {
-    opacity: 1;
-  }
-
-  .drift-wall-stage .drift-wall__overlay {
-    opacity: 0.08;
-  }
+  .drift-wall-stage .drift-wall__plane { transform: translate(-50%, -50%) scale(1, 1.35) translateZ(-35px) !important; }
+  .drift-wall-stage .drift-wall__inner { opacity: 1; }
+  .drift-wall-stage .drift-wall__overlay { opacity: 0.08; }
 }
 
 @media (max-width: 390px) {
   .drift-wall-stage .drift-wall {
-    /* Same additional +15% increase on smaller phones. */
-    --dw-tile-w: clamp(80px, 22.4vw, 92px) !important;
-    --dw-tile-h: clamp(54px, 16.2vw, 63px) !important;
+    --dw-tile-w: clamp(94px, 25.8vw, 108px) !important;
+    --dw-tile-h: clamp(63px, 18.6vw, 74px) !important;
     --dw-gap: 4px !important;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1, 1.35) translateZ(-35px) !important;
-  }
+  .drift-wall-stage .drift-wall__plane { transform: translate(-50%, -50%) scale(1, 1.35) translateZ(-35px) !important; }
 }
