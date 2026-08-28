@@ -1,5 +1,10 @@
+import { useLayoutEffect } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import DriftWall from './DriftWall/DriftWall'
 import './RB7DriftWall.mobile.css'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const items = [
   { image: '/images/gallery/gallery-01.jpg', title: '2011 Malaysian Grand Prix' },
@@ -33,6 +38,29 @@ const items = [
 ]
 
 export default function RB7DriftWall({ sectionRef }) {
+  useLayoutEffect(() => {
+    const section = sectionRef?.current
+    if (!section) return undefined
+
+    const ctx = gsap.context(() => {
+      gsap.set(section, { xPercent: 100 })
+
+      gsap.to(section, {
+        xPercent: 0,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top bottom',
+          end: 'top top',
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+      })
+    }, section)
+
+    return () => ctx.revert()
+  }, [sectionRef])
+
   return (
     <section ref={sectionRef} className="drift-wall-section" aria-label="Drift Wall showcase">
       <div className="drift-wall-stage">
