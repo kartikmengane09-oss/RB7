@@ -82,24 +82,24 @@ const DriftWall = ({
     if (!isMobile) return { tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth }
 
     return {
-      // 9 columns fit a 390–430px phone while remaining large enough to read
-      // as photographs. The cylinder supplies the visual depth.
-      tileWidth: 42,
-      tileHeight: 28,
-      gap: 4,
-      radius: 5,
+      tileWidth: 64,
+      tileHeight: 43,
+      gap: 5,
+      radius: 6,
       tilt: 3,
       turn: 0,
-      perspective: 900,
+      perspective: 760,
       depth: 0,
     }
   }, [isMobile, tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth])
 
+  const effectiveColumns = isMobile ? 6 : columns
+
   const columnItems = useMemo(() => {
-    const cols = Array.from({ length: columns }, () => [])
-    items.forEach((item, index) => cols[index % columns].push(item))
+    const cols = Array.from({ length: effectiveColumns }, () => [])
+    items.forEach((item, index) => cols[index % effectiveColumns].push(item))
     return cols.map((column) => (column.length ? column : items.slice(0, 1)))
-  }, [items, columns])
+  }, [items, effectiveColumns])
 
   const columnMeta = useMemo(() => {
     const unit = effective.tileHeight + effective.gap
