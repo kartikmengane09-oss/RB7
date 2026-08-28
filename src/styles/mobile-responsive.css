@@ -13,24 +13,24 @@
   .drive-prompt { bottom: 2.4rem; gap: .28rem; font-size: .37rem; letter-spacing: .1em; }
   .down-arrow { width: 1.05rem; height: 1.05rem; font-size: .62rem; }
 
-  /* Technical story: compact, centered, and always inside the phone. */
-  .technical-story { top: clamp(5.2rem, 9svh, 6.8rem); left: 12px; width: calc(100vw - 24px); max-width: none; transform: none; text-align: center; }
+  /* Technical story: viewport-relative left anchoring. It moves inward as the screen narrows. */
+  .technical-story { top: clamp(4.6rem, 8svh, 6.2rem); left: clamp(8px, 4vw, 18px); right: clamp(8px, 4vw, 18px); width: auto; max-width: none; transform: none; text-align: left; }
   .technical-team { margin-bottom: .22rem; font-size: clamp(.58rem, 2vw, .7rem); }
   .technical-story h2 { font-size: clamp(.78rem, 3.4vw, .94rem); line-height: 1.05; }
-  .technical-rule { width: 1.35rem; margin: .45rem auto .35rem; }
-  .technical-copy { margin: 0 auto; max-width: 92%; font-size: clamp(.45rem, 1.8vw, .54rem); line-height: 1.35; }
+  .technical-rule { width: 1.35rem; margin: .45rem 0 .35rem; }
+  .technical-copy { margin: 0; max-width: min(78vw, 20rem); font-size: clamp(.45rem, 1.8vw, .54rem); line-height: 1.35; }
 
-  /* Technical highlights: no fixed desktop offsets; bottom anchored to viewport. */
-  .technical-highlights { left: 10px !important; right: 10px !important; bottom: clamp(3.2rem, 6.5svh, 4.2rem) !important; width: auto !important; max-width: none !important; }
+  /* Highlights use viewport-relative left/right boundaries so they never leave the phone. */
+  .technical-highlights { left: clamp(8px, 4vw, 18px) !important; right: clamp(8px, 4vw, 18px) !important; bottom: clamp(3rem, 6svh, 4.2rem) !important; width: auto !important; max-width: none !important; }
   .technical-highlights h2 { margin-bottom: .35rem; font-size: clamp(.42rem, 1.75vw, .5rem); letter-spacing: .08em; }
-  .technical-highlights dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; width: 100%; }
-  .technical-highlights dl div { min-width: 0; min-height: 0; padding: 4px 4px 4px 12px; border: 1px solid rgba(162,181,224,.12); background: rgba(3,5,10,.52); overflow: hidden; }
+  .technical-highlights dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(3px, 1.1vw, 6px); width: 100%; }
+  .technical-highlights dl div { min-width: 0; min-height: 0; padding: clamp(4px, 1.2vw, 7px) clamp(4px, 1.2vw, 7px) clamp(4px, 1.2vw, 7px) clamp(11px, 3vw, 15px); border: 1px solid rgba(162,181,224,.12); background: rgba(3,5,10,.52); overflow: hidden; }
   .technical-highlights dl div::before { top: 6px; left: 3px; width: 3px; height: 3px; }
   .technical-highlights dt { margin-bottom: 1px; font-size: clamp(.36rem, 1.5vw, .42rem); line-height: 1.1; }
   .technical-highlights dd { font-size: clamp(.34rem, 1.4vw, .4rem); line-height: 1.15; overflow-wrap: anywhere; }
 
   /* Race record remains viewport-contained. */
-  .race-record { top: clamp(4.6rem, 7.5svh, 5.8rem); left: 10px; width: calc(100vw - 20px); max-width: none; }
+  .race-record { top: clamp(4.6rem, 7.5svh, 5.8rem); left: clamp(8px, 3.5vw, 15px); right: clamp(8px, 3.5vw, 15px); width: auto; max-width: none; }
   .section-kicker { margin-bottom: .25rem; font-size: clamp(.4rem, 1.7vw, .47rem); }
   .race-record h2 { font-size: clamp(1.7rem, 9vw, 2.8rem); line-height: .8; max-width: 88vw; }
   .race-record-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin-top: .55rem; width: 100%; }
@@ -38,7 +38,6 @@
   .race-record-stat strong { font-size: clamp(1.25rem, 7vw, 2.15rem); line-height: .82; }
   .race-record-stat span { font-size: clamp(.32rem, 1.35vw, .4rem); letter-spacing: .04em; line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
 
-  /* The 3D canvas is still full-screen, but the model is allowed to fit within it. */
   .webgl { width: 100vw !important; height: 100svh !important; max-width: 100vw !important; max-height: 100svh !important; }
   .technical-info, .race-record { box-sizing: border-box; }
 }
@@ -46,10 +45,11 @@
 @media (max-width: 380px) {
   .hero-name { font-size: 3rem; }
   .hero-overlay { padding: 8px; }
-  .technical-story { top: 4.8rem; left: 8px; width: calc(100vw - 16px); }
-  .technical-highlights { left: 7px !important; right: 7px !important; bottom: 3rem !important; }
+  .technical-story { top: 4.6rem; left: 7px; right: 7px; }
+  .technical-copy { max-width: 84vw; }
+  .technical-highlights { left: 7px !important; right: 7px !important; bottom: 2.8rem !important; }
   .technical-highlights dl { gap: 3px; }
-  .race-record { top: 4.35rem; left: 8px; width: calc(100vw - 16px); }
+  .race-record { top: 4.3rem; left: 7px; right: 7px; }
   .race-record-grid { gap: 3px; }
 }
 
