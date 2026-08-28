@@ -14,13 +14,9 @@
   --dw-gray: 0;
   --dw-overlay: #060010;
   --dw-edge: 40%;
-  -webkit-mask-image:
-    radial-gradient(ellipse 78% 82% at 50% 46%, #000 var(--dw-edge), transparent 100%),
-    linear-gradient(to top, #000 var(--dw-edge), transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 78% 82% at 50% 46%, #000 var(--dw-edge), transparent 100%), linear-gradient(to top, #000 var(--dw-edge), transparent 100%);
   -webkit-mask-composite: source-in;
-  mask-image:
-    radial-gradient(ellipse 78% 82% at 50% 46%, #000 var(--dw-edge), transparent 100%),
-    linear-gradient(to top, #000 var(--dw-edge), transparent 100%);
+  mask-image: radial-gradient(ellipse 78% 82% at 50% 46%, #000 var(--dw-edge), transparent 100%), linear-gradient(to top, #000 var(--dw-edge), transparent 100%);
   mask-composite: intersect;
 }
 
@@ -69,10 +65,7 @@
   opacity: var(--dw-dim);
   transform: translateZ(0);
   pointer-events: none;
-  transition:
-    transform 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
-    box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.42s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .drift-wall__tile img {
@@ -113,9 +106,41 @@
 }
 
 .drift-wall__tile:focus-visible .drift-wall__inner {
-  box-shadow:
-    0 24px 60px -18px rgba(0, 0, 0, 0.7),
-    0 0 0 2px rgba(255, 255, 255, 0.9);
+  box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.9);
+}
+
+/* Mobile: full-height, brighter, shallow cylindrical wall. */
+@media (max-width: 767px) {
+  .drift-wall {
+    --dw-edge: 100%;
+    --dw-dim: 0.82;
+    --dw-perspective: 820px;
+    --dw-tile-w: clamp(62px, 17vw, 76px);
+    --dw-tile-h: clamp(48px, 13vw, 58px);
+    --dw-gap: 5px;
+    --dw-radius: 6px;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .drift-wall__plane {
+    top: 50%;
+    left: 50%;
+    height: 145%;
+    transform-style: preserve-3d;
+  }
+
+  .drift-wall__col {
+    flex: 0 0 calc(var(--dw-tile-w) + var(--dw-gap));
+  }
+
+  .drift-wall__inner {
+    opacity: 1;
+  }
+
+  .drift-wall__overlay {
+    opacity: 0.08;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
