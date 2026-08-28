@@ -1,5 +1,5 @@
-/* Responsive DriftWall sizing. The wall keeps all 9 columns, but scales the
-   tile geometry so the composition remains visible on narrow screens. */
+/* Responsive DriftWall: keep the full 9-column wall visible on phones and
+   curve the columns gently into a shallow cylindrical gallery. */
 .drift-wall-section {
   position: relative;
   width: 100%;
@@ -19,46 +19,58 @@
 
 @media (max-width: 1100px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: 145px;
-    --dw-tile-h: 96px;
-    --dw-gap: 8px;
-    --dw-perspective: 1000px;
+    --dw-tile-w: 145px !important;
+    --dw-tile-h: 96px !important;
+    --dw-gap: 8px !important;
+    --dw-perspective: 1000px !important;
   }
 }
 
 @media (max-width: 767px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: clamp(48px, 13vw, 58px);
-    --dw-tile-h: clamp(32px, 8.5vw, 39px);
-    --dw-gap: clamp(4px, 1.2vw, 6px);
-    --dw-radius: 5px;
-    --dw-perspective: 900px;
-    --dw-lift: 28px;
+    /* 9 columns + 8 gaps fit the phone viewport rather than leaving only
+       the center of the desktop-sized plane visible. */
+    --dw-tile-w: clamp(36px, 11.2vw, 44px) !important;
+    --dw-tile-h: clamp(24px, 7.4vw, 29px) !important;
+    --dw-gap: clamp(3px, 1vw, 4px) !important;
+    --dw-radius: 4px !important;
+    --dw-perspective: 850px !important;
+    --dw-lift: 24px !important;
+    --dw-edge: 0% !important;
+  }
+
+  /* A shallow cylindrical wall: the center columns face the user and the
+     outer columns turn away progressively. This is deliberately subtle so
+     the gallery reads as a wall, not as a deep tunnel. */
+  .drift-wall-stage .drift-wall__col {
+    transform-style: preserve-3d;
+    transform: rotateY(calc((var(--dw-col-index) - 4) * -5deg))
+      translateZ(calc(abs(var(--dw-col-index) - 4) * -5px)) !important;
   }
 
   .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1) translateZ(-70px) !important;
+    transform: translate(-50%, -50%) scale(1) translateZ(-45px) !important;
   }
 
   .drift-wall-stage .drift-wall__inner {
-    opacity: 0.86;
+    opacity: 0.9;
   }
 
   .drift-wall-stage .drift-wall__overlay {
-    opacity: 0.28;
+    opacity: 0.2;
   }
 }
 
 @media (max-width: 390px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: 47px;
-    --dw-tile-h: 31px;
-    --dw-gap: 4px;
+    --dw-tile-w: 36px !important;
+    --dw-tile-h: 24px !important;
+    --dw-gap: 3px !important;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1) translateZ(-70px) !important;
+    transform: translate(-50%, -50%) scale(1) translateZ(-45px) !important;
   }
 }
