@@ -6,11 +6,7 @@ import { Vector3 } from 'three'
 
 gsap.registerPlugin(ScrollTrigger)
 
-const INITIAL_TARGET = {
-  x: 0,
-  y: 0.06,
-  z: 0.55,
-}
+const INITIAL_TARGET = { x: 0, y: 0.06, z: 0.55 }
 
 const SIDE_CAMERA_X = 6
 const SIDE_CAMERA_Y = 0
@@ -52,9 +48,8 @@ export default function RB7ScrollAnimation({
   const driveTrigger = useRef(null)
   const wheelSpin = useRef(0)
   const lastTimelineTime = useRef(0)
-  const transitionStartWheelSpin = useRef(0)
-  const initialCarZ = useRef(0)
   const transitionWheelSpin = useRef(0)
+  const initialCarZ = useRef(0)
 
   useFrame(() => {
     const model = rb7Ref?.current
@@ -62,6 +57,8 @@ export default function RB7ScrollAnimation({
 
     if (model.group) model.group.position.z = 0
 
+    // Wheel rotation is driven by the master GSAP timeline below.
+    // This preserves the wheel-spin animation from the supplied working file.
     const wheelPivots = model.wheelPivots
     if (wheelPivots) {
       Object.values(wheelPivots).forEach((wheelData) => {
@@ -71,7 +68,7 @@ export default function RB7ScrollAnimation({
     }
 
     // Keep the complete side-view RB7 inside narrow phone viewports.
-    // Desktop camera composition is untouched.
+    // Desktop camera composition remains unchanged.
     if (isMobileViewport() && camera.position.x > 4) {
       const width = window.innerWidth
       const height = window.innerHeight || 1
@@ -100,12 +97,7 @@ export default function RB7ScrollAnimation({
       target.current.z = SIDE_TARGET_Z
     }
 
-    targetVector.current.set(
-      target.current.x,
-      target.current.y,
-      target.current.z
-    )
-
+    targetVector.current.set(target.current.x, target.current.y, target.current.z)
     camera.lookAt(targetVector.current)
   })
 
@@ -121,6 +113,7 @@ export default function RB7ScrollAnimation({
     driveProgress.current = 0
     wheelSpin.current = 0
     lastTimelineTime.current = 0
+    transitionWheelSpin.current = 0
     initialCarZ.current = model?.position?.z ?? 0
 
     const context = gsap.context(() => {
@@ -310,6 +303,8 @@ export default function RB7ScrollAnimation({
         }, RACE_RECORD_HOLD_START)
       }
 
+      // Wheel spin + drive are synchronized to the SAME master timeline.
+      // This is the working behavior from the supplied animation file.
       const updateDriving = () => {
         const trigger = driveTrigger.current
         if (!trigger) return
@@ -322,7 +317,10 @@ export default function RB7ScrollAnimation({
           ))
 
           carZ.current = -DRIVE_DISTANCE * transitionProgress
-          if (model?.position) model.position.z = initialCarZ.current + carZ.current
+          if (model?.position) {
+            model.position.z = initialCarZ.current + carZ.current
+          }
+
           wheelSpin.current = transitionWheelSpin.current + (-carZ.current / WHEEL_RADIUS)
           lastTimelineTime.current = timelineTime
           return
@@ -331,12 +329,16 @@ export default function RB7ScrollAnimation({
         if (timelineTime < DRIVE_START) {
           driveProgress.current = 0
           carZ.current = 0
-          if (model?.position) model.position.z = initialCarZ.current
+          if (model?.position) {
+            model.position.z = initialCarZ.current
+          }
           lastTimelineTime.current = timelineTime
           return
         }
 
         const timelineDelta = timelineTime - lastTimelineTime.current
+
+        // Restore continuous wheel rotation during the drive section.
         wheelSpin.current += timelineDelta * WHEEL_SPIN_SPEED
         transitionWheelSpin.current = wheelSpin.current
         lastTimelineTime.current = timelineTime
@@ -347,24 +349,26 @@ export default function RB7ScrollAnimation({
 
         driveProgress.current = currentProgress
         carZ.current = -DRIVE_DISTANCE * currentProgress
-        if (model?.position) model.position.z = initialCarZ.current + carZ.current
+
+        if (model?.position) {
+          model.position.z = initialCarZ.current + carZ.current
+        }
       }
 
-      driveTrigger.current = ScrollTrigger.create({
-        trigger: '.experience-page',
-        start: 'top top',
-        end: '+=1385%',
-        scrub: true,
-        onUpdate: updateDriving,
-      })
-
-      return () => {
-        driveTrigger.current?.kill()
-        driveTrigger.current = null
-      }
+      // IMPORTANT: use the timeline's own ScrollTrigger. Do not create a
+      // second ScrollTrigger for driving; that caused the wheel animation to
+      // drift out of sync with the master scroll animation.
+      driveTrigger.current = timeline.scrollTrigger
+      timeline.eventCallback('onUpdate', updateDriving)
+      updateDriving()
     })
 
-    return () => context.revert()
+    ScrollTrigger.refresh()
+
+    return () => {
+      context.revert()
+      driveTrigger.current = null
+    }
   }, [camera, driftWallRef, heroUiRef, raceRecordRef, rb7Ref, technicalLeftRef, technicalRightRef])
 
   return null
