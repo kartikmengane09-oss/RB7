@@ -27,12 +27,12 @@
 
 @media (max-width: 767px) {
   .drift-wall-stage .drift-wall {
-    /* Six columns now fill the phone width instead of being squeezed into
-       the center. At 430px this gives roughly 68px tiles + 3px gaps. */
-    --dw-tile-w: clamp(58px, 15.8vw, 68px) !important;
-    --dw-tile-h: clamp(39px, 10.8vw, 47px) !important;
-    --dw-gap: 3px !important;
-    --dw-radius: 6px !important;
+    /* Six columns. Tiles are intentionally 30% larger than the previous
+       mobile size; the outer cards wrap around the cylindrical viewport. */
+    --dw-tile-w: clamp(75px, 19.5vw, 89px) !important;
+    --dw-tile-h: clamp(50px, 14.1vw, 61px) !important;
+    --dw-gap: 4px !important;
+    --dw-radius: 7px !important;
     --dw-perspective: 760px !important;
     --dw-lift: 24px !important;
     --dw-edge: 0% !important;
@@ -40,34 +40,34 @@
     mask-image: none !important;
   }
 
-  /* Six-column shallow cylinder: center pair faces forward and the outer
-     pairs turn away, while the total footprint stays close to 100vw. */
+  /* The cylinder radius is supplied by RB7DriftWall.jsx as a viewport-aware
+     value. Each column uses that geometry rather than a fixed mobile radius. */
   .drift-wall-stage .drift-wall__col {
     transform-style: preserve-3d;
     transform-origin: 50% 50%;
   }
 
   .drift-wall-stage .drift-wall__col:nth-child(1) {
-    transform: rotateY(-18deg) translateZ(-36px) !important;
+    transform: rotateY(-25deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.094)) !important;
   }
   .drift-wall-stage .drift-wall__col:nth-child(2) {
-    transform: rotateY(-9deg) translateZ(-14px) !important;
+    transform: rotateY(-15deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.034)) !important;
   }
   .drift-wall-stage .drift-wall__col:nth-child(3) {
-    transform: rotateY(-3deg) translateZ(-3px) !important;
+    transform: rotateY(-5deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.004)) !important;
   }
   .drift-wall-stage .drift-wall__col:nth-child(4) {
-    transform: rotateY(3deg) translateZ(-3px) !important;
+    transform: rotateY(5deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.004)) !important;
   }
   .drift-wall-stage .drift-wall__col:nth-child(5) {
-    transform: rotateY(9deg) translateZ(-14px) !important;
+    transform: rotateY(15deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.034)) !important;
   }
   .drift-wall-stage .drift-wall__col:nth-child(6) {
-    transform: rotateY(18deg) translateZ(-36px) !important;
+    transform: rotateY(25deg) translateZ(calc(var(--dw-cylinder-radius, 220px) * -0.094)) !important;
   }
 
-  /* Do not scale the plane horizontally: the six responsive columns are
-     already sized to the viewport. Keep extra vertical coverage only. */
+  /* Keep the larger six-column footprint centered while preserving the
+     vertical coverage of the wall. */
   .drift-wall-stage .drift-wall__plane {
     transform: translate(-50%, -50%) scale(1, 1.35) translateZ(-35px) !important;
   }
@@ -83,9 +83,11 @@
 
 @media (max-width: 390px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: clamp(55px, 15.8vw, 62px) !important;
-    --dw-tile-h: clamp(37px, 10.8vw, 43px) !important;
-    --dw-gap: 3px !important;
+    /* Preserve the same +30% visual scale on smaller phones while avoiding
+       an excessively wide tile footprint. */
+    --dw-tile-w: clamp(70px, 19.5vw, 80px) !important;
+    --dw-tile-h: clamp(47px, 14.1vw, 55px) !important;
+    --dw-gap: 4px !important;
   }
 }
 
