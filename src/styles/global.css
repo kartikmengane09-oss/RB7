@@ -203,9 +203,11 @@ body {
 
 /* 100 */
 .technical-story {
-  top: clamp(10.5rem, 27vh, 16.5rem);
-  left: clamp(1.5rem, 4vw, 4.5rem);
-  width: min(17rem, 22vw);
+  top: 6vh;
+  left: 50%;
+  width: min(45rem, 70vw);
+  transform: translateX(-50%);
+  text-align: center;
 }
 
 .technical-team {
@@ -345,11 +347,12 @@ body {
   /* 218 — MOBILE RIGHT-SIDE TECHNICAL INFORMATION */
   .technical-highlights {
   position: absolute !important;
-  top: auto !important;
-  bottom: 5rem !important;
-  right: 3rem !important;
-  left: auto !important;
-  width: 14rem;
+  top: 8vh !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translateX(-50%);
+  width: min(50rem, 70vw);
 }
 
   .technical-highlights dl {
@@ -394,27 +397,14 @@ body {
 .technical-highlights { position: absolute !important; top: auto !important; right: auto !important; bottom: clamp(4.5rem, 8vh, 6rem) !important; left: clamp(1.5rem, 4vw, 4.5rem) !important; }
 @media (max-width: 760px) { .technical-highlights { top: auto !important; right: auto !important; bottom: 5rem !important; left: 1.5rem !important; width: 8.4rem; } }
 
-/* Race Record and 2011 win gallery: foreground layers over the pinned RB7. */
-.race-record, .race-gallery { position: absolute; z-index: 4; pointer-events: auto; }
+/* Race Record foreground layer over the pinned RB7. */
+.race-record { position: absolute; z-index: 4; pointer-events: auto; }
 .race-record { top: clamp(5.5rem, 12vh, 8.5rem); left: clamp(1.5rem, 6vw, 7rem); width: min(23rem, 30vw); color: #f5f4f1; }
 .section-kicker { margin: 0 0 .55rem; color: #e52336; font-size: .62rem; font-weight: 700; letter-spacing: .2em; }
-.race-record h2, .race-gallery h2 { margin: 0; font-family: 'Barlow Condensed', Impact, sans-serif; font-size: clamp(2.4rem, 4vw, 4.8rem); line-height: .9; letter-spacing: -.03em; }
+.race-record h2 { margin: 0; font-family: 'Barlow Condensed', Impact, sans-serif; font-size: clamp(2.4rem, 4vw, 4.8rem); line-height: .9; letter-spacing: -.03em; }
 .race-record-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem .8rem; margin-top: 2rem; }
 .race-record-stat { display: grid; gap: .2rem; padding-top: .55rem; border-top: 1px solid rgba(162, 181, 224, .25); }
 .race-record-stat strong { font-family: 'Barlow Condensed', Impact, sans-serif; font-size: clamp(2rem, 3.4vw, 3.7rem); font-weight: 700; line-height: .8; }
 .race-record-stat span { color: rgba(255, 255, 255, .62); font-size: .58rem; font-weight: 700; letter-spacing: .16em; }
-.race-gallery { top: 8vh; left: 5vw; width: min(89vw, 94rem); color: #f5f4f1; perspective: 1200px; }
-.race-gallery-heading { margin-bottom: 1.7rem; }
-.race-gallery-wall { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(.6rem, 1.2vw, 1.2rem); align-items: start; transform: rotateX(3deg) rotateY(-4deg); transform-origin: left center; }
-.race-tile { position: relative; min-height: clamp(11rem, 22vh, 18rem); overflow: hidden; border: 1px solid rgba(187, 202, 238, .13); background: #07101e; box-shadow: 0 1.2rem 3rem rgba(0, 0, 0, .35); transform: translateY(calc((var(--tile-index) % 3) * 1.25rem)); transition: transform .35s ease, filter .35s ease; }
-.race-tile:nth-child(5n + 2), .race-tile:nth-child(5n + 4) { min-height: clamp(14rem, 29vh, 23rem); }
-.race-tile:hover, .race-tile:focus-within { filter: brightness(1.14); transform: translateY(calc((var(--tile-index) % 3) * 1.25rem - .75rem)) rotateX(-2deg); }
-.race-tile-image { position: absolute; inset: 0; background-position: center; background-size: cover; filter: grayscale(1) brightness(.45); opacity: .32; }
-.race-tile-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(3, 5, 10, .1), rgba(3, 5, 10, .92)); }
-.race-tile-copy { position: relative; z-index: 1; display: flex; min-height: inherit; flex-direction: column; justify-content: flex-end; padding: 1rem; }
-.race-tile-copy span, .race-tile-copy small { color: rgba(255, 255, 255, .65); font-size: .54rem; font-weight: 700; letter-spacing: .14em; }
-.race-tile-copy h3 { margin: .55rem 0 .15rem; color: #fff; font-family: 'Barlow Condensed', Impact, sans-serif; font-size: clamp(1.3rem, 2vw, 2.2rem); line-height: .85; }
-.race-tile-copy p { margin: 0 0 .8rem; color: rgba(255, 255, 255, .62); font-size: .68rem; }
-.race-tile-copy strong { margin-bottom: .55rem; color: #e52336; font-family: 'Barlow Condensed', Impact, sans-serif; font-size: 1.6rem; line-height: .8; }
-@media (max-width: 900px) { .race-gallery-wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } .race-record { width: min(19rem, 44vw); } }
-@media (max-width: 600px) { .race-record { top: 7rem; left: 1.5rem; width: calc(100vw - 3rem); } .race-gallery { top: 6rem; left: 1.5rem; width: calc(100vw - 3rem); } .race-gallery-wall { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; transform: none; } .race-tile, .race-tile:nth-child(5n + 2), .race-tile:nth-child(5n + 4) { min-height: 10rem; } }
+@media (max-width: 900px) { .race-record { width: min(19rem, 44vw); } }
+@media (max-width: 600px) { .race-record { top: 7rem; left: 1.5rem; width: calc(100vw - 3rem); } }

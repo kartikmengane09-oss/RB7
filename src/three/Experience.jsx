@@ -42,7 +42,6 @@ function Scene({
   technicalLeftRef,
   technicalRightRef,
   raceRecordRef,
-  raceGalleryRef,
 }) {
   return (
     <>
@@ -60,7 +59,6 @@ function Scene({
         technicalLeftRef={technicalLeftRef}
         technicalRightRef={technicalRightRef}
         raceRecordRef={raceRecordRef}
-        raceGalleryRef={raceGalleryRef}
       />
 
       {/* Existing lighting - unchanged */}
@@ -118,7 +116,7 @@ function Scene({
         receiveShadow
       >
         <circleGeometry
-          args={[3.6, 64]}
+          args={[0, 64]}
         />
 
         <MeshReflectorMaterial
@@ -153,7 +151,6 @@ export default function Experience({
   technicalLeftRef,
   technicalRightRef,
   raceRecordRef,
-  raceGalleryRef,
 }) {
   return (
     <Canvas
@@ -182,7 +179,6 @@ export default function Experience({
         technicalLeftRef={technicalLeftRef}
         technicalRightRef={technicalRightRef}
         raceRecordRef={raceRecordRef}
-        raceGalleryRef={raceGalleryRef}
       />
     </Canvas>
   )

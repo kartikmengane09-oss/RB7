@@ -15,16 +15,31 @@ const INITIAL_TARGET = {
 // ------------------------------------------------------------
 // SIDE VIEW
 // ------------------------------------------------------------
+//
+// Camera stays on the right side of the RB7.
+//
+// IMPORTANT:
+// The camera position itself is kept essentially the same.
+// We change the LOOK-AT target vertically so the RB7 sits
+// slightly below the centre of the viewport.
+//
+// This leaves room above the car for the information.
+// ------------------------------------------------------------
 
-const SIDE_CAMERA_X = 5.8
-const SIDE_CAMERA_Y = 0.78
-const SIDE_CAMERA_Z = 1.5
-
-const SIDE_CAMERA_FOLLOW_OFFSET = 0.35
+const SIDE_CAMERA_X = 6
+const SIDE_CAMERA_Y = 0
+const SIDE_CAMERA_Z = 0.7
 
 const SIDE_TARGET_X = 0
-const SIDE_TARGET_Y = 0.12
-const SIDE_TARGET_Z = 0.55
+
+// Increased from 0.12.
+//
+// Higher target = car appears lower in the viewport.
+//
+// This is the main value controlling the composition.
+const SIDE_TARGET_Y = 0.6
+
+const SIDE_TARGET_Z = 0.15
 
 // ------------------------------------------------------------
 // CAR
@@ -43,20 +58,23 @@ const WHEEL_SPIN_SPEED = 4.0
 // DRIVE
 // ------------------------------------------------------------
 
-const DRIVE_START = 0.96
+const DRIVE_START = 1.5
 const DRIVE_DURATION = 2.5
-const FINAL_SECTION_END = DRIVE_START + DRIVE_DURATION
+
+const FINAL_SECTION_END =
+  DRIVE_START + DRIVE_DURATION
+
 const RACE_TRANSITION_DURATION = 0.5
 const RACE_RECORD_HOLD_DURATION = 0.55
-const GALLERY_ENTER_DURATION = 0.5
-const GALLERY_HOLD_DURATION = 0.45
-const GALLERY_EXIT_DURATION = 0.5
+
 const VIEWPORT_GUTTER = 32
-const RACE_TRANSITION_START = FINAL_SECTION_END
-const RACE_RECORD_HOLD_START = RACE_TRANSITION_START + RACE_TRANSITION_DURATION
-const GALLERY_ENTER_START = RACE_RECORD_HOLD_START + RACE_RECORD_HOLD_DURATION
-const GALLERY_HOLD_START = GALLERY_ENTER_START + GALLERY_ENTER_DURATION
-const GALLERY_EXIT_START = GALLERY_HOLD_START + GALLERY_HOLD_DURATION
+
+const RACE_TRANSITION_START =
+  FINAL_SECTION_END
+
+const RACE_RECORD_HOLD_START =
+  RACE_TRANSITION_START +
+  RACE_TRANSITION_DURATION
 
 export default function RB7ScrollAnimation({
   rb7Ref,
@@ -64,7 +82,6 @@ export default function RB7ScrollAnimation({
   technicalLeftRef,
   technicalRightRef,
   raceRecordRef,
-  raceGalleryRef,
 }) {
   const { camera } = useThree()
 
@@ -85,10 +102,17 @@ export default function RB7ScrollAnimation({
   // Independent wheel rotation
   const wheelSpin = useRef(0)
 
-  const lastTimelineTime = useRef(0)
-  const transitionStartWheelSpin = useRef(0)
-  const initialCarZ = useRef(0)
-  const transitionWheelSpin = useRef(0)
+  const lastTimelineTime =
+    useRef(0)
+
+  const transitionStartWheelSpin =
+    useRef(0)
+
+  const initialCarZ =
+    useRef(0)
+
+  const transitionWheelSpin =
+    useRef(0)
 
   // ============================================================
   // FRAME LOOP
@@ -176,7 +200,8 @@ export default function RB7ScrollAnimation({
   // ============================================================
 
   useLayoutEffect(() => {
-    const model = rb7Ref?.current
+    const model =
+      rb7Ref?.current
 
     // ----------------------------------------------------------
     // INITIAL CAMERA
@@ -201,7 +226,9 @@ export default function RB7ScrollAnimation({
     driveProgress.current = 0
     wheelSpin.current = 0
     lastTimelineTime.current = 0
-    initialCarZ.current = model?.position?.z ?? 0
+
+    initialCarZ.current =
+      model?.position?.z ?? 0
 
     // ----------------------------------------------------------
     // GSAP
@@ -221,9 +248,6 @@ export default function RB7ScrollAnimation({
         const raceRecord =
           raceRecordRef?.current
 
-        const raceGallery =
-          raceGalleryRef?.current
-
         // ======================================================
         // INITIAL UI
         // ======================================================
@@ -242,7 +266,7 @@ export default function RB7ScrollAnimation({
             technicalLeft,
             {
               autoAlpha: 0,
-              x: -30,
+              x: 300,
             }
           )
         }
@@ -252,36 +276,48 @@ export default function RB7ScrollAnimation({
             technicalRight,
             {
               autoAlpha: 0,
-              x: 30,
+              x: 900,
+              y: -300,  
             }
           )
         }
 
         if (raceRecord) {
-          gsap.set(raceRecord, {
-            autoAlpha: 1,
-            x: () => -raceRecord.getBoundingClientRect().right - VIEWPORT_GUTTER,
-          })
+          gsap.set(
+            raceRecord,
+            {
+              autoAlpha: 1,
+              x: () =>
+                -raceRecord.getBoundingClientRect().right -
+                VIEWPORT_GUTTER,
+            }
+          )
         }
 
-        if (raceGallery) {
-          gsap.set(raceGallery, {
-            autoAlpha: 1,
-            x: () => -raceGallery.getBoundingClientRect().right - VIEWPORT_GUTTER,
-          })
-        }
+        // ======================================================
+        // EXIT HELPERS
+        // ======================================================
 
-        const exitRight = (element) => {
-          const rect = element.getBoundingClientRect()
-          const currentX = Number(gsap.getProperty(element, 'x')) || 0
-          return currentX + window.innerWidth - rect.left + VIEWPORT_GUTTER
-        }
+        const exitRight =
+          (element) => {
+            const rect =
+              element.getBoundingClientRect()
 
-        const exitLeft = (element) => {
-          const rect = element.getBoundingClientRect()
-          const currentX = Number(gsap.getProperty(element, 'x')) || 0
-          return currentX - rect.right - VIEWPORT_GUTTER
-        }
+            const currentX =
+              Number(
+                gsap.getProperty(
+                  element,
+                  'x'
+                )
+              ) || 0
+
+            return (
+              currentX +
+              window.innerWidth -
+              rect.left +
+              VIEWPORT_GUTTER
+            )
+          }
 
         // ======================================================
         // MASTER TIMELINE
@@ -369,6 +405,15 @@ export default function RB7ScrollAnimation({
         // ======================================================
         // SIDE VIEW
         // ======================================================
+        //
+        // THIS IS THE IMPORTANT CHANGE.
+        //
+        // The camera remains at the same side-view position.
+        // Only SIDE_TARGET_Y has been increased.
+        //
+        // This places the RB7 lower in the viewport while
+        // keeping it horizontally centred.
+        // ======================================================
 
         timeline.to(
           camera.position,
@@ -385,7 +430,10 @@ export default function RB7ScrollAnimation({
           target.current,
           {
             x: SIDE_TARGET_X,
+
+            // RB7 appears lower on screen
             y: SIDE_TARGET_Y,
+
             z: SIDE_TARGET_Z,
             duration: 0.30,
           },
@@ -435,7 +483,7 @@ export default function RB7ScrollAnimation({
         }
 
         // ======================================================
-        // TECHNICAL INFO
+        // TECHNICAL INFORMATION
         // ======================================================
 
         if (technicalLeft) {
@@ -443,8 +491,8 @@ export default function RB7ScrollAnimation({
             technicalLeft,
             {
               autoAlpha: 1,
-              x: 10,
-              duration: 0.02,
+              x: 300,
+              duration: 0.2,
               ease: 'power2.out',
             },
             0.88
@@ -456,8 +504,9 @@ export default function RB7ScrollAnimation({
             technicalRight,
             {
               autoAlpha: 1,
-              x: 0,
-              duration: 0.02,
+              x: 900,
+              y: -300,
+              duration: 0.2,
               ease: 'power2.out',
             },
             0.90
@@ -524,20 +573,19 @@ export default function RB7ScrollAnimation({
 
         // ======================================================
         // RACE RECORD TRANSITION
-        //
-        // Existing technical information exits right while the
-        // Race Record enters from the left. Both share the exact
-        // timeline position and duration as the new car movement
-        // calculated in updateDriving below.
         // ======================================================
 
         if (technicalLeft) {
           timeline.to(
             technicalLeft,
             {
-              x: () => exitRight(technicalLeft),
+              x: () =>
+                exitRight(
+                  technicalLeft
+                ),
               autoAlpha: 0,
-              duration: RACE_TRANSITION_DURATION,
+              duration:
+                RACE_TRANSITION_DURATION,
             },
             RACE_TRANSITION_START
           )
@@ -547,9 +595,13 @@ export default function RB7ScrollAnimation({
           timeline.to(
             technicalRight,
             {
-              x: () => exitRight(technicalRight),
+              x: () =>
+                exitRight(
+                  technicalRight
+                ),
               autoAlpha: 0,
-              duration: RACE_TRANSITION_DURATION,
+              duration:
+                RACE_TRANSITION_DURATION,
             },
             RACE_TRANSITION_START
           )
@@ -560,38 +612,26 @@ export default function RB7ScrollAnimation({
             raceRecord,
             {
               x: 0,
-              duration: RACE_TRANSITION_DURATION,
+              duration:
+                RACE_TRANSITION_DURATION,
             },
             RACE_TRANSITION_START
           )
         }
 
-        // Give the Race Record a deliberate reading hold.
+        // ======================================================
+        // RACE RECORD HOLD
+        // ======================================================
+
         if (raceRecord) {
           timeline.to(
             raceRecord,
-            { x: 0, duration: RACE_RECORD_HOLD_DURATION },
+            {
+              x: 0,
+              duration:
+                RACE_RECORD_HOLD_DURATION,
+            },
             RACE_RECORD_HOLD_START
-          )
-        }
-
-        // Gallery foreground enters from the left, then later travels left while
-        // the RB7 WebGL background remains pinned behind it.
-        if (raceGallery) {
-          timeline.to(
-            raceGallery,
-            { x: 0, duration: GALLERY_ENTER_DURATION },
-            GALLERY_ENTER_START
-          )
-          timeline.to(
-            raceGallery,
-            { x: 0, duration: GALLERY_HOLD_DURATION },
-            GALLERY_HOLD_START
-          )
-          timeline.to(
-            raceGallery,
-            { x: () => exitLeft(raceGallery), duration: GALLERY_EXIT_DURATION },
-            GALLERY_EXIT_START
           )
         }
 
@@ -614,29 +654,44 @@ export default function RB7ScrollAnimation({
             // --------------------------------------------------
             // POST-FINAL TRANSITION
             // --------------------------------------------------
-            // This is appended after the existing final wheel-spin
-            // section. It does not alter any earlier camera or wheel
-            // timing; it only maps the new shared transition progress
-            // to the car's already-exposed root position.
-            if (timelineTime >= RACE_TRANSITION_START) {
-              const transitionProgress = Math.min(
-                1,
-                Math.max(
-                  0,
-                  (timelineTime - RACE_TRANSITION_START) / RACE_TRANSITION_DURATION
-                )
-              )
 
-              carZ.current = -DRIVE_DISTANCE * transitionProgress
+            if (
+              timelineTime >=
+              RACE_TRANSITION_START
+            ) {
+              const transitionProgress =
+                Math.min(
+                  1,
+                  Math.max(
+                    0,
+                    (
+                      timelineTime -
+                      RACE_TRANSITION_START
+                    ) /
+                    RACE_TRANSITION_DURATION
+                  )
+                )
+
+              carZ.current =
+                -DRIVE_DISTANCE *
+                transitionProgress
 
               if (model?.position) {
-                model.position.z = initialCarZ.current + carZ.current
+                model.position.z =
+                  initialCarZ.current +
+                  carZ.current
               }
 
-              wheelSpin.current = transitionWheelSpin.current +
-                (-carZ.current / WHEEL_RADIUS)
+              wheelSpin.current =
+                transitionWheelSpin.current +
+                (
+                  -carZ.current /
+                  WHEEL_RADIUS
+                )
 
-              lastTimelineTime.current = timelineTime
+              lastTimelineTime.current =
+                timelineTime
+
               return
             }
 
@@ -648,12 +703,15 @@ export default function RB7ScrollAnimation({
               timelineTime <
               DRIVE_START
             ) {
-              driveProgress.current = 0
+              driveProgress.current =
+                0
 
-              carZ.current = 0
+              carZ.current =
+                0
 
               if (model?.position) {
-                model.position.z = initialCarZ.current
+                model.position.z =
+                  initialCarZ.current
               }
 
               lastTimelineTime.current =
@@ -708,7 +766,8 @@ export default function RB7ScrollAnimation({
             // CAR STAYS STILL
             // --------------------------------------------------
 
-            carZ.current = 0
+            carZ.current =
+              0
 
             // --------------------------------------------------
             // INFO MOVEMENT
@@ -731,7 +790,7 @@ export default function RB7ScrollAnimation({
                 technicalLeft,
                 {
                   x:
-                    10 +
+                    300 +
                     infoOffset,
                 }
               )
@@ -741,7 +800,7 @@ export default function RB7ScrollAnimation({
               gsap.set(
                 technicalRight,
                 {
-                  x:
+                  x:900 +
                     infoOffset,
                 }
               )

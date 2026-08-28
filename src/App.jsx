@@ -4,7 +4,6 @@ import Experience from './three/Experience'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
 import RB7TechnicalInfo from './components/RB7TechnicalInfo'
 import RB7RaceRecord from './components/RB7RaceRecord'
-import RB7RaceWinGallery from './components/RB7RaceWinGallery'
 
 function LoadingScreen() {
   const { active, progress } = useProgress()
@@ -37,7 +36,6 @@ export default function App() {
   const technicalLeftRef = useRef(null)
   const technicalRightRef = useRef(null)
   const raceRecordRef = useRef(null)
-  const raceGalleryRef = useRef(null)
 
   return (
     <main className="experience-page">
@@ -54,7 +52,6 @@ export default function App() {
         technicalLeftRef={technicalLeftRef}
         technicalRightRef={technicalRightRef}
         raceRecordRef={raceRecordRef}
-        raceGalleryRef={raceGalleryRef}
       />
 
       <div
@@ -103,7 +100,6 @@ export default function App() {
           rightPanelRef={technicalRightRef}
         />
         <RB7RaceRecord recordRef={raceRecordRef} />
-        <RB7RaceWinGallery galleryRef={raceGalleryRef} />
       </div>
 
       <LoadingScreen />
