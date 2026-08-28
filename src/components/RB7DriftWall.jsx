@@ -41,33 +41,47 @@ export default function RB7DriftWall({ sectionRef }) {
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
   )
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth : 430
+  )
 
   useEffect(() => {
     const media = window.matchMedia('(max-width: 767px)')
     const onChange = (event) => setIsMobile(event.matches)
+    const onResize = () => setViewportWidth(window.innerWidth)
     media.addEventListener('change', onChange)
-    return () => media.removeEventListener('change', onChange)
+    window.addEventListener('resize', onResize)
+    return () => {
+      media.removeEventListener('change', onChange)
+      window.removeEventListener('resize', onResize)
+    }
   }, [])
 
   const columns = isMobile ? 6 : 9
 
   const columnStyles = useMemo(() => {
     const center = (columns - 1) / 2
+    // Radius scales with the device width, so the cylinder keeps the same
+    // visual proportion on narrow and wide phones.
+    const cylinderRadius = isMobile
+      ? Math.max(150, Math.min(viewportWidth * 0.78, 340))
+      : 0
+
     return Array.from({ length: columns }, (_, index) => {
       const offset = index - center
       const normalized = center ? offset / center : 0
-      // Larger cylinder radius: the side columns travel farther around the
-      // viewer, creating more separation without shrinking the six tiles.
-      const turn = normalized * (isMobile ? 24 : 22)
+      const angle = normalized * (isMobile ? 25 : 22)
       const depth = isMobile
-        ? 190 - Math.abs(normalized) * 30
+        ? -Math.round(cylinderRadius * (1 - Math.cos((angle * Math.PI) / 180)))
         : Math.max(0, 115 - Math.abs(normalized) * 70)
+
       return {
-        '--dw-col-turn': `${turn}deg`,
+        '--dw-col-turn': `${angle}deg`,
         '--dw-col-depth': `${depth}px`,
+        '--dw-cylinder-radius': `${cylinderRadius}px`,
       }
     })
-  }, [columns, isMobile])
+  }, [columns, isMobile, viewportWidth])
 
   useLayoutEffect(() => {
     const section = sectionRef?.current
