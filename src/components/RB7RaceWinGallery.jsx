@@ -1,4 +1,5 @@
 import DriftWall from './DriftWall'
+import './RB7RaceWinGallery.css'
 
 const RACE_WINS = [
   { round: '01', race: 'AUSTRALIA', location: 'Melbourne', winner: 'Sebastian Vettel', image: '/images/rb7/australia.jpg' },
