@@ -42,6 +42,7 @@ const DriftWall = ({
   overlayColor = '#060010',
   className = '',
   style,
+  columnStyles = [],
 }) => {
   const containerRef = useRef(null)
   const planeRef = useRef(null)
@@ -59,6 +60,7 @@ const DriftWall = ({
   const [activeId, setActiveId] = useState(null)
   const activeIdRef = useRef(null)
   const [reduced, setReduced] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     setReduced(prefersReducedMotion())
@@ -68,6 +70,31 @@ const DriftWall = ({
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    const onChange = (event) => setIsMobile(event.matches)
+    setIsMobile(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  const effective = useMemo(() => {
+    if (!isMobile) return { tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth }
+
+    return {
+      // 9 columns fit a 390–430px phone while remaining large enough to read
+      // as photographs. The cylinder supplies the visual depth.
+      tileWidth: 42,
+      tileHeight: 28,
+      gap: 4,
+      radius: 5,
+      tilt: 3,
+      turn: 0,
+      perspective: 900,
+      depth: 0,
+    }
+  }, [isMobile, tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth])
+
   const columnItems = useMemo(() => {
     const cols = Array.from({ length: columns }, () => [])
     items.forEach((item, index) => cols[index % columns].push(item))
@@ -75,13 +102,13 @@ const DriftWall = ({
   }, [items, columns])
 
   const columnMeta = useMemo(() => {
-    const unit = tileHeight + gap
+    const unit = effective.tileHeight + effective.gap
     return columnItems.map((column) => {
       const copyHeight = Math.max(unit, column.length * unit)
-      const copies = Math.max(2, Math.ceil((containerHeight * 1.6) / copyHeight) + 1)
+      const copies = Math.max(4, Math.ceil((containerHeight * 3) / copyHeight) + 3)
       return { copyHeight, copies }
     })
-  }, [columnItems, tileHeight, gap, containerHeight])
+  }, [columnItems, effective.tileHeight, effective.gap, containerHeight])
 
   useLayoutEffect(() => {
     if (!containerRef.current) return undefined
@@ -110,11 +137,11 @@ const DriftWall = ({
       const plane = planeRef.current
       if (!plane) return
       plane.style.transform =
-        `translate(-50%, -50%) scale(1.18) ` +
-        `rotateX(${tilt + pointerY}deg) rotateY(${turn + pointerX}deg) rotateZ(${roll}deg) ` +
-        `translateZ(${-depth}px)`
+        `translate(-50%, -50%) scale(${isMobile ? 1 : 1.18}) ` +
+        `rotateX(${effective.tilt + pointerY}deg) rotateY(${effective.turn + pointerX}deg) rotateZ(${roll}deg) ` +
+        `translateZ(${-effective.depth}px)`
     },
-    [tilt, turn, roll, depth]
+    [effective.tilt, effective.turn, effective.depth, isMobile, roll]
   )
 
   useEffect(() => {
@@ -199,18 +226,18 @@ const DriftWall = ({
   }, [release])
 
   const cssVars = useMemo(() => ({
-    '--dw-tile-w': `${tileWidth}px`,
-    '--dw-tile-h': `${tileHeight}px`,
-    '--dw-gap': `${gap}px`,
-    '--dw-radius': `${radius}px`,
-    '--dw-perspective': `${perspective}px`,
+    '--dw-tile-w': `${effective.tileWidth}px`,
+    '--dw-tile-h': `${effective.tileHeight}px`,
+    '--dw-gap': `${effective.gap}px`,
+    '--dw-radius': `${effective.radius}px`,
+    '--dw-perspective': `${effective.perspective}px`,
     '--dw-lift': `${lift}px`,
     '--dw-dim': dim,
     '--dw-gray': grayscale ? 1 : 0,
     '--dw-overlay': overlayColor,
     '--dw-edge': `${Math.max(0, (1 - fade) * 100)}%`,
     ...style,
-  }), [tileWidth, tileHeight, gap, radius, perspective, lift, dim, grayscale, overlayColor, fade, style])
+  }), [effective, lift, dim, grayscale, overlayColor, fade, style])
 
   const renderTile = (item, id, columnIndex) => {
     const inner = (
@@ -251,8 +278,9 @@ const DriftWall = ({
         {columnItems.map((column, columnIndex) => {
           const meta = columnMeta[columnIndex]
           const copies = Array.from({ length: meta.copies })
+          const customColumnStyle = columnStyles[columnIndex] || {}
           return (
-            <div className="drift-wall__col" key={`col-${columnIndex}`}>
+            <div className="drift-wall__col" key={`col-${columnIndex}`} style={customColumnStyle}>
               <div className="drift-wall__track" ref={(element) => { trackRefs.current[columnIndex] = element }}>
                 {copies.map((_, copyIndex) => column.map((item, itemIndex) => renderTile(item, `${columnIndex}-${copyIndex}-${itemIndex}`, columnIndex)))}
               </div>
