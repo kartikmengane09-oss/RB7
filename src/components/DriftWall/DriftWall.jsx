@@ -57,6 +57,7 @@ const DriftWall = ({
   const lastTsRef = useRef(null)
 
   const [containerHeight, setContainerHeight] = useState(600)
+  const [viewportWidth, setViewportWidth] = useState(0)
   const [activeId, setActiveId] = useState(null)
   const activeIdRef = useRef(null)
   const [reduced, setReduced] = useState(false)
@@ -78,20 +79,36 @@ const DriftWall = ({
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
+  useEffect(() => {
+    const updateViewportWidth = () => setViewportWidth(window.innerWidth)
+    updateViewportWidth()
+    window.addEventListener('resize', updateViewportWidth)
+    return () => window.removeEventListener('resize', updateViewportWidth)
+  }, [])
+
   const effective = useMemo(() => {
     if (!isMobile) return { tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth }
 
+    // Six mobile columns should span essentially the entire phone width.
+    // Reserve only a small gap between columns so the photographic tiles can
+    // stay large and readable instead of becoming narrow thumbnails.
+    const mobileGap = 3
+    const mobileTileWidth = viewportWidth > 0
+      ? Math.max(58, Math.min(70, viewportWidth / 6 - mobileGap))
+      : 65
+    const mobileTileHeight = mobileTileWidth * 0.67
+
     return {
-      tileWidth: 64,
-      tileHeight: 43,
-      gap: 5,
+      tileWidth: mobileTileWidth,
+      tileHeight: mobileTileHeight,
+      gap: mobileGap,
       radius: 6,
       tilt: 3,
       turn: 0,
       perspective: 760,
       depth: 0,
     }
-  }, [isMobile, tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth])
+  }, [isMobile, viewportWidth, tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth])
 
   // Desktop keeps the caller's column count; phones use a more spacious six-column composition.
   const effectiveColumns = isMobile ? 6 : columns
