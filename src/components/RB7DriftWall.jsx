@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import DriftWall from './DriftWall/DriftWall'
@@ -38,15 +38,32 @@ const items = [
 ]
 
 export default function RB7DriftWall({ sectionRef }) {
-  const columnStyles = useMemo(() => Array.from({ length: 9 }, (_, index) => {
-    const offset = index - 4
-    const turn = offset * 5.5
-    const depth = Math.max(0, 82 - Math.abs(offset) * 18)
-    return {
-      '--dw-col-turn': `${turn}deg`,
-      '--dw-col-depth': `${depth}px`,
-    }
-  }), [])
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  )
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)')
+    const onChange = (event) => setIsMobile(event.matches)
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
+  }, [])
+
+  const columns = isMobile ? 6 : 9
+
+  const columnStyles = useMemo(() => {
+    const center = (columns - 1) / 2
+    return Array.from({ length: columns }, (_, index) => {
+      const offset = index - center
+      const normalized = center ? offset / center : 0
+      const turn = normalized * (isMobile ? 18 : 22)
+      const depth = Math.max(0, 115 - Math.abs(normalized) * 70)
+      return {
+        '--dw-col-turn': `${turn}deg`,
+        '--dw-col-depth': `${depth}px`,
+      }
+    })
+  }, [columns, isMobile])
 
   useLayoutEffect(() => {
     const section = sectionRef?.current
@@ -79,7 +96,7 @@ export default function RB7DriftWall({ sectionRef }) {
       <div className="drift-wall-stage">
         <DriftWall
           items={items}
-          columns={9}
+          columns={columns}
           tileWidth={200}
           tileHeight={132}
           gap={18}
