@@ -1,53 +1,60 @@
 /* Mobile layout pass. DriftWall is intentionally excluded. */
 @media (max-width: 767px) {
   .experience-page { min-height: 100svh; height: 100svh; overflow: hidden; }
-  .hero-overlay { padding: max(12px, 3.5vw); }
-  .hero-name { font-size: clamp(3.35rem, 17vw, 5rem); line-height: .72; max-width: 72vw; }
-  .hero-year { font-size: clamp(.7rem, 2.8vw, .95rem); }
-  .hero-mark { gap: .32rem; max-width: 78vw; }
-  .team-label { top: .8rem; right: .65rem; font-size: .38rem; letter-spacing: .13em; }
-  .rb7-background-title { top: 39%; width: 100vw; font-size: clamp(10rem, 58vw, 15rem); line-height: .78; }
-  .red-bull-symbol { top: 39%; width: 92vw; max-width: none; opacity: .2; }
-  .season-label, .built-label { bottom: .8rem; max-width: 28vw; font-size: .38rem; line-height: 1.25; letter-spacing: .055em; }
-  .season-label { left: .7rem; } .built-label { right: .7rem; }
-  .drive-prompt { bottom: 2.7rem; gap: .32rem; font-size: .4rem; letter-spacing: .12em; }
-  .down-arrow { width: 1.15rem; height: 1.15rem; font-size: .68rem; }
+  .hero-overlay { padding: max(10px, 3vw); }
+  .hero-name { font-size: clamp(3rem, 15vw, 4.7rem); line-height: .72; max-width: 68vw; }
+  .hero-year { font-size: clamp(.68rem, 2.6vw, .9rem); }
+  .hero-mark { gap: .28rem; max-width: 74vw; }
+  .team-label { top: .7rem; right: .55rem; font-size: .36rem; letter-spacing: .11em; }
+  .rb7-background-title { top: 38%; width: 100vw; font-size: clamp(9rem, 55vw, 14rem); line-height: .78; }
+  .red-bull-symbol { top: 38%; width: 90vw; max-width: none; opacity: .18; }
+  .season-label, .built-label { bottom: .65rem; max-width: 25vw; font-size: .35rem; line-height: 1.2; letter-spacing: .045em; }
+  .season-label { left: .6rem; } .built-label { right: .6rem; }
+  .drive-prompt { bottom: 2.4rem; gap: .28rem; font-size: .37rem; letter-spacing: .1em; }
+  .down-arrow { width: 1.05rem; height: 1.05rem; font-size: .62rem; }
 
-  /* Keep technical information inside the physical viewport. */
-  .technical-story { top: 8svh; left: 50%; width: calc(100vw - 32px); max-width: 24rem; transform: translateX(-50%); text-align: center; }
-  .technical-team { margin-bottom: .25rem; font-size: clamp(.62rem, 2.2vw, .75rem); }
-  .technical-story h2 { font-size: clamp(.82rem, 3.8vw, 1rem); }
-  .technical-rule { width: 1.5rem; margin: .55rem auto .45rem; }
-  .technical-copy { font-size: clamp(.48rem, 2vw, .58rem); line-height: 1.4; }
+  /* Technical story: compact, centered, and always inside the phone. */
+  .technical-story { top: clamp(5.2rem, 9svh, 6.8rem); left: 12px; width: calc(100vw - 24px); max-width: none; transform: none; text-align: center; }
+  .technical-team { margin-bottom: .22rem; font-size: clamp(.58rem, 2vw, .7rem); }
+  .technical-story h2 { font-size: clamp(.78rem, 3.4vw, .94rem); line-height: 1.05; }
+  .technical-rule { width: 1.35rem; margin: .45rem auto .35rem; }
+  .technical-copy { margin: 0 auto; max-width: 92%; font-size: clamp(.45rem, 1.8vw, .54rem); line-height: 1.35; }
 
-  .technical-highlights { left: 12px !important; right: 12px !important; bottom: 4.1rem !important; width: auto !important; max-width: none !important; }
-  .technical-highlights h2 { margin-bottom: .45rem; font-size: clamp(.45rem, 1.9vw, .54rem); letter-spacing: .1em; }
-  .technical-highlights dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; width: 100%; }
-  .technical-highlights dl div { min-width: 0; min-height: 0; padding: 5px 5px 5px 13px; border: 1px solid rgba(162,181,224,.14); background: rgba(3,5,10,.5); overflow: hidden; }
-  .technical-highlights dl div::before { top: 7px; left: 4px; width: 4px; height: 4px; }
-  .technical-highlights dt { margin-bottom: 2px; font-size: clamp(.38rem, 1.65vw, .46rem); white-space: normal; }
-  .technical-highlights dd { font-size: clamp(.36rem, 1.55vw, .43rem); line-height: 1.2; overflow-wrap: anywhere; }
+  /* Technical highlights: no fixed desktop offsets; bottom anchored to viewport. */
+  .technical-highlights { left: 10px !important; right: 10px !important; bottom: clamp(3.2rem, 6.5svh, 4.2rem) !important; width: auto !important; max-width: none !important; }
+  .technical-highlights h2 { margin-bottom: .35rem; font-size: clamp(.42rem, 1.75vw, .5rem); letter-spacing: .08em; }
+  .technical-highlights dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; width: 100%; }
+  .technical-highlights dl div { min-width: 0; min-height: 0; padding: 4px 4px 4px 12px; border: 1px solid rgba(162,181,224,.12); background: rgba(3,5,10,.52); overflow: hidden; }
+  .technical-highlights dl div::before { top: 6px; left: 3px; width: 3px; height: 3px; }
+  .technical-highlights dt { margin-bottom: 1px; font-size: clamp(.36rem, 1.5vw, .42rem); line-height: 1.1; }
+  .technical-highlights dd { font-size: clamp(.34rem, 1.4vw, .4rem); line-height: 1.15; overflow-wrap: anywhere; }
 
-  /* Race record stays within the viewport at every phone width. */
-  .race-record { top: 5.4rem; left: 12px; width: calc(100vw - 24px); max-width: none; }
-  .section-kicker { margin-bottom: .3rem; font-size: clamp(.42rem, 1.8vw, .5rem); }
-  .race-record h2 { font-size: clamp(1.85rem, 10vw, 3rem); line-height: .82; max-width: 90vw; }
-  .race-record-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin-top: .7rem; width: 100%; }
-  .race-record-stat { min-width: 0; padding: 5px 5px 4px; overflow: hidden; background: rgba(3,5,10,.32); }
-  .race-record-stat strong { font-size: clamp(1.35rem, 7.5vw, 2.3rem); line-height: .85; }
-  .race-record-stat span { font-size: clamp(.34rem, 1.5vw, .42rem); letter-spacing: .055em; white-space: normal; }
+  /* Race record remains viewport-contained. */
+  .race-record { top: clamp(4.6rem, 7.5svh, 5.8rem); left: 10px; width: calc(100vw - 20px); max-width: none; }
+  .section-kicker { margin-bottom: .25rem; font-size: clamp(.4rem, 1.7vw, .47rem); }
+  .race-record h2 { font-size: clamp(1.7rem, 9vw, 2.8rem); line-height: .8; max-width: 88vw; }
+  .race-record-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; margin-top: .55rem; width: 100%; }
+  .race-record-stat { min-width: 0; padding: 4px; overflow: hidden; background: rgba(3,5,10,.3); }
+  .race-record-stat strong { font-size: clamp(1.25rem, 7vw, 2.15rem); line-height: .82; }
+  .race-record-stat span { font-size: clamp(.32rem, 1.35vw, .4rem); letter-spacing: .04em; line-height: 1.1; white-space: normal; overflow-wrap: anywhere; }
 
+  /* The 3D canvas is still full-screen, but the model is allowed to fit within it. */
+  .webgl { width: 100vw !important; height: 100svh !important; max-width: 100vw !important; max-height: 100svh !important; }
   .technical-info, .race-record { box-sizing: border-box; }
 }
 
 @media (max-width: 380px) {
-  .hero-name { font-size: 3.2rem; }
-  .hero-overlay { padding: 10px; }
-  .technical-story { top: 7svh; width: calc(100vw - 24px); }
-  .technical-highlights { left: 8px !important; right: 8px !important; bottom: 3.6rem !important; }
-  .technical-highlights dl { gap: 4px; }
-  .race-record { top: 4.9rem; left: 8px; width: calc(100vw - 16px); }
-  .race-record-grid { gap: 4px; }
+  .hero-name { font-size: 3rem; }
+  .hero-overlay { padding: 8px; }
+  .technical-story { top: 4.8rem; left: 8px; width: calc(100vw - 16px); }
+  .technical-highlights { left: 7px !important; right: 7px !important; bottom: 3rem !important; }
+  .technical-highlights dl { gap: 3px; }
+  .race-record { top: 4.35rem; left: 8px; width: calc(100vw - 16px); }
+  .race-record-grid { gap: 3px; }
+}
+
+@media (min-width: 768px) {
+  /* Explicitly preserve desktop composition. */
 }
 
 @media (prefers-reduced-motion: reduce) {
