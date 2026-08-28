@@ -1,4 +1,5 @@
 import DriftWall from './DriftWall/DriftWall'
+import './RB7DriftWall.mobile.css'
 
 const items = [
   { image: '/images/gallery/gallery-01.jpg', title: '2011 Malaysian Grand Prix' },
