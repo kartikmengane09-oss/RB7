@@ -93,6 +93,7 @@ const DriftWall = ({
     }
   }, [isMobile, tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth])
 
+  // Desktop keeps the caller's column count; phones use a more spacious six-column composition.
   const effectiveColumns = isMobile ? 6 : columns
 
   const columnItems = useMemo(() => {
@@ -278,7 +279,17 @@ const DriftWall = ({
         {columnItems.map((column, columnIndex) => {
           const meta = columnMeta[columnIndex]
           const copies = Array.from({ length: meta.copies })
-          const customColumnStyle = columnStyles[columnIndex] || {}
+          const customColumnStyle = isMobile
+            ? (() => {
+                const offset = columnIndex - (effectiveColumns - 1) / 2
+                const turnAmount = offset * 9
+                const depthAmount = Math.max(0, 150 - Math.abs(offset) * 38)
+                return {
+                  '--dw-col-turn': `${turnAmount}deg`,
+                  '--dw-col-depth': `${depthAmount}px`,
+                }
+              })()
+            : (columnStyles[columnIndex] || {})
           return (
             <div className="drift-wall__col" key={`col-${columnIndex}`} style={customColumnStyle}>
               <div className="drift-wall__track" ref={(element) => { trackRefs.current[columnIndex] = element }}>
