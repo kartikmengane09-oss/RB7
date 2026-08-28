@@ -1,4 +1,4 @@
-import { useLayoutEffect } from 'react'
+import { useLayoutEffect, useMemo } from 'react'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import DriftWall from './DriftWall/DriftWall'
@@ -38,6 +38,16 @@ const items = [
 ]
 
 export default function RB7DriftWall({ sectionRef }) {
+  const columnStyles = useMemo(() => Array.from({ length: 9 }, (_, index) => {
+    const offset = index - 4
+    const turn = offset * 5.5
+    const depth = Math.max(0, 82 - Math.abs(offset) * 18)
+    return {
+      '--dw-col-turn': `${turn}deg`,
+      '--dw-col-depth': `${depth}px`,
+    }
+  }), [])
+
   useLayoutEffect(() => {
     const section = sectionRef?.current
     if (!section) return undefined
@@ -45,9 +55,6 @@ export default function RB7DriftWall({ sectionRef }) {
     const ctx = gsap.context(() => {
       gsap.set(section, { xPercent: 100 })
 
-      // The master RB7 experience is pinned for 1385% of the viewport.
-      // The gallery's existing vertical entrance begins around 84% of that
-      // timeline, so this container transition uses the same scroll window.
       const galleryStart = () => window.innerHeight * 11.66
       const galleryEnd = () => window.innerHeight * 13.85
 
@@ -88,6 +95,7 @@ export default function RB7DriftWall({ sectionRef }) {
           fade={0}
           dim={0.95}
           overlayColor="transparent"
+          columnStyles={columnStyles}
         />
       </div>
     </section>
