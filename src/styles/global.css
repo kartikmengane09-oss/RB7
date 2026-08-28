@@ -7,6 +7,7 @@ body { overflow-x: hidden; }
 .experience-page { position: relative; width: 100%; height: 100svh; overflow: hidden; isolation: isolate; background: radial-gradient(ellipse 48% 42% at 50% 40%, rgba(31, 44, 74, .48) 0%, rgba(14, 21, 37, .2) 42%, transparent 72%), radial-gradient(ellipse 130% 108% at 50% 52%, #05070c 26%, #020304 68%, #000000 100%); }
 .webgl { position: absolute !important; z-index: 2; inset: 0; width: 100% !important; height: 100% !important; }
 .rb7-background-title { position: absolute; z-index: 1; top: 35%; left: 50%; width: 81%; transform: translate(-50%, -50%); pointer-events: none; white-space: nowrap; color: rgba(20, 35, 70, .5); text-align: center; font-family: 'Barlow Condensed', Impact, sans-serif; font-size: clamp(18rem, 43vw, 48rem); font-weight: 800; line-height: .8; letter-spacing: .002em; user-select: none; }
+.red-bull-symbol { position: absolute; z-index: 1; top: 35%; left: 50%; width: min(78vw, 80rem); height: auto; transform: translate(-50%, -50%); mix-blend-mode: screen; opacity: .32; pointer-events: none; user-select: none; }
 .hero-overlay { pointer-events: none; position: absolute; inset: 0; z-index: 3; padding: clamp(1.5rem, 4vw, 4.5rem); }
 .hero-primary-ui { width: 100%; height: 100%; }
 .hero-mark { display: flex; align-items: baseline; gap: .75rem; font-family: 'Barlow Condensed', Impact, sans-serif; font-weight: 700; letter-spacing: -.045em; }
@@ -408,3 +409,19 @@ body {
 .race-record-stat span { color: rgba(255, 255, 255, .62); font-size: .58rem; font-weight: 700; letter-spacing: .16em; }
 @media (max-width: 900px) { .race-record { width: min(19rem, 44vw); } }
 @media (max-width: 600px) { .race-record { top: 7rem; left: 1.5rem; width: calc(100vw - 3rem); } }
+
+.drift-wall-section {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: transparent;
+  will-change: transform;
+}
+
+.drift-wall-stage {
+  width: 100%;
+  height: 100%;
+}

@@ -4,6 +4,7 @@ import Experience from './three/Experience'
 import { useSmoothScroll } from './hooks/useSmoothScroll'
 import RB7TechnicalInfo from './components/RB7TechnicalInfo'
 import RB7RaceRecord from './components/RB7RaceRecord'
+import RB7DriftWall from './components/RB7DriftWall'
 
 function LoadingScreen() {
   const { active, progress } = useProgress()
@@ -36,15 +37,17 @@ export default function App() {
   const technicalLeftRef = useRef(null)
   const technicalRightRef = useRef(null)
   const raceRecordRef = useRef(null)
+  const driftWallRef = useRef(null)
 
   return (
-    <main className="experience-page">
-      <div
-        className="rb7-background-title"
+    <>
+      <main className="experience-page">
+      <img
+        className="red-bull-symbol"
+        src="/images/red-bull-symbol.png"
+        alt=""
         aria-hidden="true"
-      >
-        RB7
-      </div>
+      />
 
       <Experience
         rb7Ref={rb7Ref}
@@ -52,6 +55,7 @@ export default function App() {
         technicalLeftRef={technicalLeftRef}
         technicalRightRef={technicalRightRef}
         raceRecordRef={raceRecordRef}
+        driftWallRef={driftWallRef}
       />
 
       <div
@@ -102,7 +106,9 @@ export default function App() {
         <RB7RaceRecord recordRef={raceRecordRef} />
       </div>
 
-      <LoadingScreen />
-    </main>
+        <RB7DriftWall sectionRef={driftWallRef} />
+        <LoadingScreen />
+      </main>
+    </>
   )
 }

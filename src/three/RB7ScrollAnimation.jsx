@@ -66,6 +66,7 @@ const FINAL_SECTION_END =
 
 const RACE_TRANSITION_DURATION = 0.5
 const RACE_RECORD_HOLD_DURATION = 0.55
+const GALLERY_ENTRANCE_DURATION = 0.95
 
 const VIEWPORT_GUTTER = 32
 
@@ -76,12 +77,17 @@ const RACE_RECORD_HOLD_START =
   RACE_TRANSITION_START +
   RACE_TRANSITION_DURATION
 
+const GALLERY_ENTRANCE_START =
+  RACE_RECORD_HOLD_START +
+  RACE_RECORD_HOLD_DURATION
+
 export default function RB7ScrollAnimation({
   rb7Ref,
   heroUiRef,
   technicalLeftRef,
   technicalRightRef,
   raceRecordRef,
+  driftWallRef,
 }) {
   const { camera } = useThree()
 
@@ -248,6 +254,18 @@ export default function RB7ScrollAnimation({
         const raceRecord =
           raceRecordRef?.current
 
+        const driftWall =
+          driftWallRef?.current
+
+        const driftWallColumns =
+          driftWall
+            ? Array.from(
+                driftWall.querySelectorAll(
+                  '.drift-wall__col'
+                )
+              )
+            : []
+
         // ======================================================
         // INITIAL UI
         // ======================================================
@@ -294,6 +312,27 @@ export default function RB7ScrollAnimation({
           )
         }
 
+        if (driftWall) {
+          gsap.set(
+            driftWall,
+            {
+              xPercent: 0,
+            }
+          )
+        }
+
+        if (driftWallColumns.length) {
+          gsap.set(
+            driftWallColumns,
+            {
+              yPercent: (index) =>
+                index % 2 === 0
+                  ? 130
+                  : -130,
+            }
+          )
+        }
+
         // ======================================================
         // EXIT HELPERS
         // ======================================================
@@ -333,7 +372,7 @@ export default function RB7ScrollAnimation({
                 'top top',
 
               end:
-                '+=1165%',
+                '+=1385%',
 
               pin:
                 true,
@@ -620,6 +659,26 @@ export default function RB7ScrollAnimation({
         }
 
         // ======================================================
+        // DRIFT WALL ENTRANCE
+        // ======================================================
+        // The wall remains a normal full-viewport section. Its
+        // columns enter vertically in the same alternating direction
+        // as their existing upward/downward DriftWall motion.
+
+        if (driftWallColumns.length) {
+          timeline.to(
+            driftWallColumns,
+            {
+              yPercent: 0,
+              duration:
+                GALLERY_ENTRANCE_DURATION,
+              ease: 'power3.out',
+            },
+            GALLERY_ENTRANCE_START
+          )
+        }
+
+        // ======================================================
         // RACE RECORD HOLD
         // ======================================================
 
@@ -840,6 +899,7 @@ export default function RB7ScrollAnimation({
     heroUiRef,
     technicalLeftRef,
     technicalRightRef,
+    driftWallRef,
   ])
 
   return null

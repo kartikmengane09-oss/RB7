@@ -42,6 +42,7 @@ function Scene({
   technicalLeftRef,
   technicalRightRef,
   raceRecordRef,
+  driftWallRef,
 }) {
   return (
     <>
@@ -59,6 +60,7 @@ function Scene({
         technicalLeftRef={technicalLeftRef}
         technicalRightRef={technicalRightRef}
         raceRecordRef={raceRecordRef}
+        driftWallRef={driftWallRef}
       />
 
       {/* Existing lighting - unchanged */}
@@ -151,6 +153,7 @@ export default function Experience({
   technicalLeftRef,
   technicalRightRef,
   raceRecordRef,
+  driftWallRef,
 }) {
   return (
     <Canvas
@@ -179,6 +182,7 @@ export default function Experience({
         technicalLeftRef={technicalLeftRef}
         technicalRightRef={technicalRightRef}
         raceRecordRef={raceRecordRef}
+        driftWallRef={driftWallRef}
       />
     </Canvas>
   )
