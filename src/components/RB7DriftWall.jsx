@@ -1,4 +1,10 @@
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import DriftWall from './DriftWall/DriftWall'
+import './RB7DriftWall.mobile.css'
+
+gsap.registerPlugin(ScrollTrigger)
 
 const items = [
   { image: '/images/gallery/gallery-01.jpg', title: '2011 Malaysian Grand Prix' },
@@ -32,12 +38,83 @@ const items = [
 ]
 
 export default function RB7DriftWall({ sectionRef }) {
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches
+  )
+  const [viewportWidth, setViewportWidth] = useState(() =>
+    typeof window !== 'undefined' ? window.innerWidth : 430
+  )
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 767px)')
+    const onChange = (event) => setIsMobile(event.matches)
+    const onResize = () => setViewportWidth(window.innerWidth)
+    media.addEventListener('change', onChange)
+    window.addEventListener('resize', onResize)
+    return () => {
+      media.removeEventListener('change', onChange)
+      window.removeEventListener('resize', onResize)
+    }
+  }, [])
+
+  const columns = isMobile ? 6 : 9
+
+  const columnStyles = useMemo(() => {
+    const center = (columns - 1) / 2
+    // Radius scales with the device width, so the cylinder keeps the same
+    // visual proportion on narrow and wide phones.
+    const cylinderRadius = isMobile
+      ? Math.max(150, Math.min(viewportWidth * 0.78, 340))
+      : 0
+
+    return Array.from({ length: columns }, (_, index) => {
+      const offset = index - center
+      const normalized = center ? offset / center : 0
+      const angle = normalized * (isMobile ? 25 : 22)
+      const depth = isMobile
+        ? -Math.round(cylinderRadius * (1 - Math.cos((angle * Math.PI) / 180)))
+        : Math.max(0, 115 - Math.abs(normalized) * 70)
+
+      return {
+        '--dw-col-turn': `${angle}deg`,
+        '--dw-col-depth': `${depth}px`,
+        '--dw-cylinder-radius': `${cylinderRadius}px`,
+      }
+    })
+  }, [columns, isMobile, viewportWidth])
+
+  useLayoutEffect(() => {
+    const section = sectionRef?.current
+    if (!section) return undefined
+
+    const ctx = gsap.context(() => {
+      gsap.set(section, { xPercent: 100 })
+
+      const galleryStart = () => window.innerHeight * 11.66
+      const galleryEnd = () => window.innerHeight * 13.85
+
+      gsap.to(section, {
+        xPercent: 0,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: '.experience-page',
+          start: () => `top+=${galleryStart()} top`,
+          end: () => `top+=${galleryEnd()} top`,
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+      })
+    }, section)
+
+    return () => ctx.revert()
+  }, [sectionRef])
+
   return (
     <section ref={sectionRef} className="drift-wall-section" aria-label="Drift Wall showcase">
       <div className="drift-wall-stage">
         <DriftWall
           items={items}
-          columns={9}
+          columns={columns}
           tileWidth={200}
           tileHeight={132}
           gap={18}
@@ -53,6 +130,7 @@ export default function RB7DriftWall({ sectionRef }) {
           fade={0}
           dim={0.95}
           overlayColor="transparent"
+          columnStyles={columnStyles}
         />
       </div>
     </section>

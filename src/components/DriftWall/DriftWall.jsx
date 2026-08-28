@@ -42,6 +42,7 @@ const DriftWall = ({
   overlayColor = '#060010',
   className = '',
   style,
+  columnStyles = [],
 }) => {
   const containerRef = useRef(null)
   const planeRef = useRef(null)
@@ -56,9 +57,11 @@ const DriftWall = ({
   const lastTsRef = useRef(null)
 
   const [containerHeight, setContainerHeight] = useState(600)
+  const [viewportWidth, setViewportWidth] = useState(0)
   const [activeId, setActiveId] = useState(null)
   const activeIdRef = useRef(null)
   const [reduced, setReduced] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
     setReduced(prefersReducedMotion())
@@ -68,20 +71,62 @@ const DriftWall = ({
     return () => mq.removeEventListener('change', onChange)
   }, [])
 
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    const onChange = (event) => setIsMobile(event.matches)
+    setIsMobile(mq.matches)
+    mq.addEventListener('change', onChange)
+    return () => mq.removeEventListener('change', onChange)
+  }, [])
+
+  useEffect(() => {
+    const updateViewportWidth = () => setViewportWidth(window.innerWidth)
+    updateViewportWidth()
+    window.addEventListener('resize', updateViewportWidth)
+    return () => window.removeEventListener('resize', updateViewportWidth)
+  }, [])
+
+  const effective = useMemo(() => {
+    if (!isMobile) return { tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth }
+
+    // Six mobile columns should span essentially the entire phone width.
+    // Reserve only a small gap between columns so the photographic tiles can
+    // stay large and readable instead of becoming narrow thumbnails.
+    const mobileGap = 3
+    const mobileTileWidth = viewportWidth > 0
+      ? Math.max(58, Math.min(70, viewportWidth / 6 - mobileGap))
+      : 65
+    const mobileTileHeight = mobileTileWidth * 0.67
+
+    return {
+      tileWidth: mobileTileWidth,
+      tileHeight: mobileTileHeight,
+      gap: mobileGap,
+      radius: 6,
+      tilt: 3,
+      turn: 0,
+      perspective: 760,
+      depth: 0,
+    }
+  }, [isMobile, viewportWidth, tileWidth, tileHeight, gap, radius, tilt, turn, perspective, depth])
+
+  // Desktop keeps the caller's column count; phones use a more spacious six-column composition.
+  const effectiveColumns = isMobile ? 6 : columns
+
   const columnItems = useMemo(() => {
-    const cols = Array.from({ length: columns }, () => [])
-    items.forEach((item, index) => cols[index % columns].push(item))
+    const cols = Array.from({ length: effectiveColumns }, () => [])
+    items.forEach((item, index) => cols[index % effectiveColumns].push(item))
     return cols.map((column) => (column.length ? column : items.slice(0, 1)))
-  }, [items, columns])
+  }, [items, effectiveColumns])
 
   const columnMeta = useMemo(() => {
-    const unit = tileHeight + gap
+    const unit = effective.tileHeight + effective.gap
     return columnItems.map((column) => {
       const copyHeight = Math.max(unit, column.length * unit)
-      const copies = Math.max(2, Math.ceil((containerHeight * 1.6) / copyHeight) + 1)
+      const copies = Math.max(4, Math.ceil((containerHeight * 3) / copyHeight) + 3)
       return { copyHeight, copies }
     })
-  }, [columnItems, tileHeight, gap, containerHeight])
+  }, [columnItems, effective.tileHeight, effective.gap, containerHeight])
 
   useLayoutEffect(() => {
     if (!containerRef.current) return undefined
@@ -110,11 +155,11 @@ const DriftWall = ({
       const plane = planeRef.current
       if (!plane) return
       plane.style.transform =
-        `translate(-50%, -50%) scale(1.18) ` +
-        `rotateX(${tilt + pointerY}deg) rotateY(${turn + pointerX}deg) rotateZ(${roll}deg) ` +
-        `translateZ(${-depth}px)`
+        `translate(-50%, -50%) scale(${isMobile ? 1 : 1.18}) ` +
+        `rotateX(${effective.tilt + pointerY}deg) rotateY(${effective.turn + pointerX}deg) rotateZ(${roll}deg) ` +
+        `translateZ(${-effective.depth}px)`
     },
-    [tilt, turn, roll, depth]
+    [effective.tilt, effective.turn, effective.depth, isMobile, roll]
   )
 
   useEffect(() => {
@@ -199,18 +244,18 @@ const DriftWall = ({
   }, [release])
 
   const cssVars = useMemo(() => ({
-    '--dw-tile-w': `${tileWidth}px`,
-    '--dw-tile-h': `${tileHeight}px`,
-    '--dw-gap': `${gap}px`,
-    '--dw-radius': `${radius}px`,
-    '--dw-perspective': `${perspective}px`,
+    '--dw-tile-w': `${effective.tileWidth}px`,
+    '--dw-tile-h': `${effective.tileHeight}px`,
+    '--dw-gap': `${effective.gap}px`,
+    '--dw-radius': `${effective.radius}px`,
+    '--dw-perspective': `${effective.perspective}px`,
     '--dw-lift': `${lift}px`,
     '--dw-dim': dim,
     '--dw-gray': grayscale ? 1 : 0,
     '--dw-overlay': overlayColor,
     '--dw-edge': `${Math.max(0, (1 - fade) * 100)}%`,
     ...style,
-  }), [tileWidth, tileHeight, gap, radius, perspective, lift, dim, grayscale, overlayColor, fade, style])
+  }), [effective, lift, dim, grayscale, overlayColor, fade, style])
 
   const renderTile = (item, id, columnIndex) => {
     const inner = (
@@ -251,8 +296,19 @@ const DriftWall = ({
         {columnItems.map((column, columnIndex) => {
           const meta = columnMeta[columnIndex]
           const copies = Array.from({ length: meta.copies })
+          const customColumnStyle = isMobile
+            ? (() => {
+                const offset = columnIndex - (effectiveColumns - 1) / 2
+                const turnAmount = offset * 9
+                const depthAmount = Math.max(0, 150 - Math.abs(offset) * 38)
+                return {
+                  '--dw-col-turn': `${turnAmount}deg`,
+                  '--dw-col-depth': `${depthAmount}px`,
+                }
+              })()
+            : (columnStyles[columnIndex] || {})
           return (
-            <div className="drift-wall__col" key={`col-${columnIndex}`}>
+            <div className="drift-wall__col" key={`col-${columnIndex}`} style={customColumnStyle}>
               <div className="drift-wall__track" ref={(element) => { trackRefs.current[columnIndex] = element }}>
                 {copies.map((_, copyIndex) => column.map((item, itemIndex) => renderTile(item, `${columnIndex}-${copyIndex}-${itemIndex}`, columnIndex)))}
               </div>
