@@ -1,5 +1,4 @@
-/* Responsive DriftWall: preserve the dense 9-column composition on phones,
-   while bending the columns into a shallow cylindrical viewing surface. */
+/* Mobile/tablet DriftWall tuning. Desktop behavior stays untouched. */
 .drift-wall-section {
   position: relative;
   width: 100%;
@@ -28,76 +27,91 @@
 
 @media (max-width: 767px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: clamp(38px, 10.2vw, 44px) !important;
-    --dw-tile-h: clamp(25px, 6.8vw, 30px) !important;
-    --dw-gap: clamp(3px, 0.9vw, 4px) !important;
-    --dw-radius: 4px !important;
-    --dw-perspective: 900px !important;
+    /* 9 columns stay visible across the phone. The slightly wider tiles
+       leave enough visual weight for the cylindrical perspective. */
+    --dw-tile-w: clamp(42px, 12.4vw, 50px) !important;
+    --dw-tile-h: clamp(29px, 8.2vw, 34px) !important;
+    --dw-gap: clamp(3px, 1vw, 4px) !important;
+    --dw-radius: 5px !important;
+    --dw-perspective: 780px !important;
     --dw-lift: 24px !important;
     --dw-edge: 0% !important;
+
+    /* The stock DriftWall mask fades the lower portion of the plane. On a
+       portrait gallery that makes the bottom half look empty, so let the
+       image wall occupy the complete viewport. */
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
   }
 
-  /* Shallow cylindrical gallery: centre columns face forward while the
-     outside columns progressively turn away and recede. */
+  /* True shallow-cylinder treatment: the center column faces forward while
+     the columns progressively turn and recede toward both edges. */
   .drift-wall-stage .drift-wall__col {
     transform-style: preserve-3d;
     transform-origin: 50% 50%;
   }
 
   .drift-wall-stage .drift-wall__col:nth-child(1) {
-    transform: rotateY(-22deg) translateZ(170px) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(2) {
-    transform: rotateY(-16deg) translateZ(205px) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(3) {
-    transform: rotateY(-10deg) translateZ(230px) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(4) {
-    transform: rotateY(-5deg) translateZ(245px) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(5) {
-    transform: rotateY(0deg) translateZ(250px) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(6) {
-    transform: rotateY(5deg) translateZ(245px) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(7) {
-    transform: rotateY(10deg) translateZ(230px) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(8) {
-    transform: rotateY(16deg) translateZ(205px) !important;
-  }
-  .drift-wall-stage .drift-wall__col:nth-child(9) {
-    transform: rotateY(22deg) translateZ(170px) !important;
+    transform: rotateY(-22deg) translateZ(-42px) !important;
   }
 
-  /* Oversize the plane vertically so the moving tracks cover the complete
-     phone viewport instead of leaving an empty lower half. */
+  .drift-wall-stage .drift-wall__col:nth-child(2) {
+    transform: rotateY(-16deg) translateZ(-27px) !important;
+  }
+
+  .drift-wall-stage .drift-wall__col:nth-child(3) {
+    transform: rotateY(-10deg) translateZ(-15px) !important;
+  }
+
+  .drift-wall-stage .drift-wall__col:nth-child(4) {
+    transform: rotateY(-5deg) translateZ(-5px) !important;
+  }
+
+  .drift-wall-stage .drift-wall__col:nth-child(5) {
+    transform: rotateY(0deg) translateZ(0) !important;
+  }
+
+  .drift-wall-stage .drift-wall__col:nth-child(6) {
+    transform: rotateY(5deg) translateZ(-5px) !important;
+  }
+
+  .drift-wall-stage .drift-wall__col:nth-child(7) {
+    transform: rotateY(10deg) translateZ(-15px) !important;
+  }
+
+  .drift-wall-stage .drift-wall__col:nth-child(8) {
+    transform: rotateY(16deg) translateZ(-27px) !important;
+  }
+
+  .drift-wall-stage .drift-wall__col:nth-child(9) {
+    transform: rotateY(22deg) translateZ(-42px) !important;
+  }
+
+  /* Give the wall extra vertical coverage so the moving tracks extend beyond
+     both the top and bottom edges of a portrait phone. */
   .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1, 1.42) translateZ(-40px) !important;
-    transform-origin: 50% 50%;
+    transform: translate(-50%, -50%) scale(1.18, 1.45) translateZ(-55px) !important;
   }
 
   .drift-wall-stage .drift-wall__inner {
-    opacity: 0.9;
+    opacity: 0.94;
   }
 
   .drift-wall-stage .drift-wall__overlay {
-    opacity: 0.2;
+    opacity: 0.16;
   }
 }
 
 @media (max-width: 390px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: 38px !important;
-    --dw-tile-h: 25px !important;
+    --dw-tile-w: 42px !important;
+    --dw-tile-h: 29px !important;
     --dw-gap: 3px !important;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1, 1.42) translateZ(-40px) !important;
+    transform: translate(-50%, -50%) scale(1.18, 1.45) translateZ(-55px) !important;
   }
 }
