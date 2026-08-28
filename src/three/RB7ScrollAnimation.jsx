@@ -33,6 +33,30 @@ const GALLERY_ENTRANCE_START = RACE_RECORD_HOLD_START + RACE_RECORD_HOLD_DURATIO
 const isMobileViewport = () =>
   typeof window !== 'undefined' && window.innerWidth <= 767
 
+const getMobileSideCamera = () => {
+  if (typeof window === 'undefined') {
+    return { x: SIDE_CAMERA_X, y: SIDE_CAMERA_Y, z: SIDE_CAMERA_Z, fov: 32 }
+  }
+
+  const width = window.innerWidth
+  const height = window.innerHeight || 1
+  const aspect = width / height
+
+  // Base aspect-ratio fitting keeps the side view inside the viewport.
+  // MOBILE_CAR_SCALE then moves the camera back by 15% while preserving
+  // the exact side-view angle (x/z are scaled together).
+  const baseFit = Math.min(1.55, Math.max(1, 0.72 / Math.max(aspect, 0.01)))
+  const fit = baseFit / MOBILE_CAR_SCALE
+  const fov = Math.min(58, 32 + (1 - Math.min(aspect, 1)) * 24)
+
+  return {
+    x: SIDE_CAMERA_X * fit,
+    y: SIDE_CAMERA_Y,
+    z: SIDE_CAMERA_Z * fit,
+    fov,
+  }
+}
+
 export default function RB7ScrollAnimation({
   rb7Ref,
   heroUiRef,
@@ -59,7 +83,6 @@ export default function RB7ScrollAnimation({
     if (model.group) model.group.position.z = 0
 
     // Wheel rotation is driven by the master GSAP timeline below.
-    // This preserves the wheel-spin animation from the supplied working file.
     const wheelPivots = model.wheelPivots
     if (wheelPivots) {
       Object.values(wheelPivots).forEach((wheelData) => {
@@ -68,36 +91,10 @@ export default function RB7ScrollAnimation({
       })
     }
 
-    // Keep the complete side-view RB7 inside narrow phone viewports.
-    // Desktop camera composition remains unchanged.
-    if (isMobileViewport() && camera.position.x > 4) {
-      const width = window.innerWidth
-      const height = window.innerHeight || 1
-      const aspect = width / height
-      const baseFit = Math.min(1.55, Math.max(1, 0.72 / Math.max(aspect, 0.01)))
-      const fit = baseFit / MOBILE_CAR_SCALE
-      camera.position.x = SIDE_CAMERA_X * fit
-      camera.position.z = SIDE_CAMERA_Z * fit
-      camera.fov = Math.min(58, 32 + (1 - Math.min(aspect, 1)) * 24)
-      camera.updateProjectionMatrix()
-    } else if (!isMobileViewport() && camera.fov !== 32) {
-      camera.fov = 32
-      camera.updateProjectionMatrix()
-    }
-
+    // Camera fitting is handled by the master timeline. Do not overwrite
+    // GSAP camera values every frame: doing so makes the big-to-side mobile
+    // transition jump instead of easing smoothly.
     if (carZ.current !== 0) {
-      const mobile = isMobileViewport()
-      const aspect = mobile
-        ? window.innerWidth / (window.innerHeight || 1)
-        : 1
-      const baseFit = mobile
-        ? Math.min(1.55, Math.max(1, 0.72 / Math.max(aspect, 0.01)))
-        : 1
-      const fit = mobile ? baseFit / MOBILE_CAR_SCALE : 1
-
-      camera.position.x = SIDE_CAMERA_X * fit
-      camera.position.y = SIDE_CAMERA_Y
-      camera.position.z = SIDE_CAMERA_Z * fit
       target.current.x = SIDE_TARGET_X
       target.current.y = SIDE_TARGET_Y
       target.current.z = SIDE_TARGET_Z
@@ -135,6 +132,12 @@ export default function RB7ScrollAnimation({
       const mobile = isMobileViewport()
       const technicalStoryStartX = mobile ? 0 : 300
       const technicalHighlightsStartX = mobile ? 0 : 900
+      const mobileSideCamera = mobile ? getMobileSideCamera() : {
+        x: SIDE_CAMERA_X,
+        y: SIDE_CAMERA_Y,
+        z: SIDE_CAMERA_Z,
+        fov: 32,
+      }
 
       if (heroUi) gsap.set(heroUi, { autoAlpha: 1 })
 
@@ -192,30 +195,49 @@ export default function RB7ScrollAnimation({
       timeline.to(camera.position, { x: 2.7, y: 1.05, z: 2.75, duration: 0.25 }, 0.20)
       timeline.to(target.current, { x: 0, y: 0.24, z: 0.40, duration: 0.25 }, 0.20)
 
+      // On mobile the final side-view camera is farther away, and the
+      // distance + FOV are animated together. This removes the previous
+      // visible snap from the large hero car into the smaller side view.
       timeline.to(camera.position, {
-        x: SIDE_CAMERA_X,
-        y: SIDE_CAMERA_Y,
-        z: SIDE_CAMERA_Z,
+        x: mobileSideCamera.x,
+        y: mobileSideCamera.y,
+        z: mobileSideCamera.z,
         duration: 0.30,
+        ease: 'power2.inOut',
+      }, 0.45)
+      timeline.to(camera, {
+        fov: mobileSideCamera.fov,
+        duration: 0.30,
+        ease: 'power2.inOut',
+        onUpdate: () => camera.updateProjectionMatrix(),
       }, 0.45)
       timeline.to(target.current, {
         x: SIDE_TARGET_X,
         y: SIDE_TARGET_Y,
         z: SIDE_TARGET_Z,
         duration: 0.30,
+        ease: 'power2.inOut',
       }, 0.45)
 
       timeline.to(camera.position, {
-        x: SIDE_CAMERA_X,
-        y: SIDE_CAMERA_Y,
-        z: SIDE_CAMERA_Z,
+        x: mobileSideCamera.x,
+        y: mobileSideCamera.y,
+        z: mobileSideCamera.z,
         duration: 0.13,
+        ease: 'sine.inOut',
+      }, 0.75)
+      timeline.to(camera, {
+        fov: mobileSideCamera.fov,
+        duration: 0.13,
+        ease: 'sine.inOut',
+        onUpdate: () => camera.updateProjectionMatrix(),
       }, 0.75)
       timeline.to(target.current, {
         x: SIDE_TARGET_X,
         y: SIDE_TARGET_Y,
         z: SIDE_TARGET_Z,
         duration: 0.13,
+        ease: 'sine.inOut',
       }, 0.75)
 
       if (heroUi) {
@@ -246,9 +268,9 @@ export default function RB7ScrollAnimation({
       }
 
       timeline.to(camera.position, {
-        x: SIDE_CAMERA_X,
-        y: SIDE_CAMERA_Y,
-        z: SIDE_CAMERA_Z,
+        x: mobileSideCamera.x,
+        y: mobileSideCamera.y,
+        z: mobileSideCamera.z,
         duration: 0.06,
       }, 0.90)
       timeline.to(target.current, {
@@ -259,9 +281,9 @@ export default function RB7ScrollAnimation({
       }, 0.90)
 
       timeline.to(camera.position, {
-        x: SIDE_CAMERA_X,
-        y: SIDE_CAMERA_Y,
-        z: SIDE_CAMERA_Z,
+        x: mobileSideCamera.x,
+        y: mobileSideCamera.y,
+        z: mobileSideCamera.z,
         duration: DRIVE_DURATION,
       }, DRIVE_START)
       timeline.to(target.current, {
@@ -310,7 +332,6 @@ export default function RB7ScrollAnimation({
       }
 
       // Wheel spin + drive are synchronized to the SAME master timeline.
-      // This is the working behavior from the supplied animation file.
       const updateDriving = () => {
         const trigger = driveTrigger.current
         if (!trigger) return
@@ -344,7 +365,6 @@ export default function RB7ScrollAnimation({
 
         const timelineDelta = timelineTime - lastTimelineTime.current
 
-        // Restore continuous wheel rotation during the drive section.
         wheelSpin.current += timelineDelta * WHEEL_SPIN_SPEED
         transitionWheelSpin.current = wheelSpin.current
         lastTimelineTime.current = timelineTime
@@ -361,9 +381,6 @@ export default function RB7ScrollAnimation({
         }
       }
 
-      // IMPORTANT: use the timeline's own ScrollTrigger. Do not create a
-      // second ScrollTrigger for driving; that caused the wheel animation to
-      // drift out of sync with the master scroll animation.
       driveTrigger.current = timeline.scrollTrigger
       timeline.eventCallback('onUpdate', updateDriving)
       updateDriving()
