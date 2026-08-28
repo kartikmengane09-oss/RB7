@@ -38,10 +38,10 @@ const items = [
 ]
 
 export default function RB7DriftWall({ sectionRef }) {
-  const columnStyles = useMemo(() => Array.from({ length: 6 }, (_, index) => {
-    const offset = index - 2.5
-    const turn = offset * 7
-    const depth = Math.max(0, 110 - Math.abs(offset) * 24)
+  const columnStyles = useMemo(() => Array.from({ length: 9 }, (_, index) => {
+    const offset = index - 4
+    const turn = offset * 5.5
+    const depth = Math.max(0, 82 - Math.abs(offset) * 18)
     return {
       '--dw-col-turn': `${turn}deg`,
       '--dw-col-depth': `${depth}px`,
@@ -79,7 +79,7 @@ export default function RB7DriftWall({ sectionRef }) {
       <div className="drift-wall-stage">
         <DriftWall
           items={items}
-          columns={6}
+          columns={9}
           tileWidth={200}
           tileHeight={132}
           gap={18}
