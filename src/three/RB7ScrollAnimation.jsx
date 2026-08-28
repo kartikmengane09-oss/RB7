@@ -28,7 +28,10 @@ const RACE_TRANSITION_START = FINAL_SECTION_END
 const RACE_RECORD_HOLD_START = RACE_TRANSITION_START + RACE_TRANSITION_DURATION
 const GALLERY_ENTRANCE_START = RACE_RECORD_HOLD_START + RACE_RECORD_HOLD_DURATION
 const DESKTOP_SIDE_DISTANCE = Math.hypot(5.27, 0.83)
-const DESKTOP_SIDE_X = Math.sqrt(DESKTOP_SIDE_DISTANCE ** 2 - SIDE_CAMERA_Z ** 2)
+const DESKTOP_SIDE_SCALE = DESKTOP_SIDE_DISTANCE / Math.hypot(SIDE_CAMERA_X, SIDE_CAMERA_Z)
+const DESKTOP_SIDE_X = SIDE_CAMERA_X * DESKTOP_SIDE_SCALE
+const DESKTOP_SIDE_Z = SIDE_CAMERA_Z * DESKTOP_SIDE_SCALE
+const DESKTOP_MID_Z = Math.sqrt(Math.max(0, DESKTOP_SIDE_DISTANCE ** 2 - 2.7 ** 2 - 1.05 ** 2))
 
 const isMobileViewport = () => typeof window !== 'undefined' && window.innerWidth <= 767
 
@@ -88,8 +91,7 @@ export default function RB7ScrollAnimation({ rb7Ref, heroUiRef, technicalLeftRef
       const technicalStoryStartX = mobile ? 0 : 300
       const technicalHighlightsStartX = mobile ? 0 : 900
       const mobileSideCamera = getMobileSideCamera()
-      const desktopSideCamera = { x: DESKTOP_SIDE_X, y: SIDE_CAMERA_Y, z: SIDE_CAMERA_Z, fov: 32 }
-      const sideCamera = mobile ? mobileSideCamera : desktopSideCamera
+      const sideCamera = mobile ? mobileSideCamera : { x: DESKTOP_SIDE_X, y: SIDE_CAMERA_Y, z: DESKTOP_SIDE_Z, fov: 32 }
 
       if (heroUi) gsap.set(heroUi, { autoAlpha: 1 })
       if (technicalLeft) gsap.set(technicalLeft, { autoAlpha: 0, x: technicalStoryStartX })
@@ -106,9 +108,19 @@ export default function RB7ScrollAnimation({ rb7Ref, heroUiRef, technicalLeftRef
 
       const timeline = gsap.timeline({ scrollTrigger: { trigger: '.experience-page', start: 'top top', end: '+=1385%', pin: true, scrub: 1, invalidateOnRefresh: true }, defaults: { ease: 'none' } })
 
-      timeline.to(camera.position, { x: 0, y: 0.82, z: 4.55, duration: 0.20 }, 0)
+      // Desktop keeps a constant camera distance during the scroll so the
+      // RB7 does not visually zoom in/out. Mobile retains its approved
+      // responsive camera path below through the shared sideCamera values.
+      const desktopHeroZ = mobile ? 4.55 : 5.27
+      const desktopMidZ = mobile ? 2.75 : DESKTOP_MID_Z
+      const heroCameraX = 0
+      const heroCameraY = 0.82
+      const midCameraX = 2.7
+      const midCameraY = 1.05
+
+      timeline.to(camera.position, { x: heroCameraX, y: heroCameraY, z: desktopHeroZ, duration: 0.20 }, 0)
       timeline.to(target.current, { x: 0, y: 0.10, z: 0.60, duration: 0.20 }, 0)
-      timeline.to(camera.position, { x: 2.7, y: 1.05, z: 2.75, duration: 0.25 }, 0.20)
+      timeline.to(camera.position, { x: midCameraX, y: midCameraY, z: desktopMidZ, duration: 0.25 }, 0.20)
       timeline.to(target.current, { x: 0, y: 0.24, z: 0.40, duration: 0.25 }, 0.20)
       timeline.to(camera.position, { x: sideCamera.x, y: sideCamera.y, z: sideCamera.z, duration: 0.30, ease: 'power2.inOut' }, 0.45)
       timeline.to(camera, { fov: sideCamera.fov, duration: 0.30, ease: 'power2.inOut', onUpdate: () => camera.updateProjectionMatrix() }, 0.45)
