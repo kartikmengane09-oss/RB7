@@ -45,13 +45,19 @@ export default function RB7DriftWall({ sectionRef }) {
     const ctx = gsap.context(() => {
       gsap.set(section, { xPercent: 100 })
 
+      // The master RB7 experience is pinned for 1385% of the viewport.
+      // The gallery's existing vertical entrance begins around 84% of that
+      // timeline, so this container transition uses the same scroll window.
+      const galleryStart = () => window.innerHeight * 11.66
+      const galleryEnd = () => window.innerHeight * 13.85
+
       gsap.to(section, {
         xPercent: 0,
         ease: 'power3.out',
         scrollTrigger: {
-          trigger: section,
-          start: 'top bottom',
-          end: 'top top',
+          trigger: '.experience-page',
+          start: () => `top+=${galleryStart()} top`,
+          end: () => `top+=${galleryEnd()} top`,
           scrub: 1,
           invalidateOnRefresh: true,
         },
