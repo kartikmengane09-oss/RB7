@@ -109,16 +109,15 @@
   box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.9);
 }
 
-/* Mobile: full-height, brighter, shallow cylindrical wall. */
+/* Mobile uses the actual responsive dimensions from DriftWall.jsx.
+   The columns form a shallow cylinder: center columns come forward and the
+   outer columns turn away. The wall is deliberately much taller than the
+   viewport so upward motion can never expose a blank lower half. */
 @media (max-width: 767px) {
   .drift-wall {
     --dw-edge: 100%;
-    --dw-dim: 0.82;
-    --dw-perspective: 820px;
-    --dw-tile-w: clamp(62px, 17vw, 76px);
-    --dw-tile-h: clamp(48px, 13vw, 58px);
-    --dw-gap: 5px;
-    --dw-radius: 6px;
+    --dw-dim: 0.9;
+    --dw-perspective: 900px;
     -webkit-mask-image: none;
     mask-image: none;
   }
@@ -126,12 +125,16 @@
   .drift-wall__plane {
     top: 50%;
     left: 50%;
-    height: 145%;
+    height: auto;
+    min-height: 260vh;
     transform-style: preserve-3d;
   }
 
   .drift-wall__col {
     flex: 0 0 calc(var(--dw-tile-w) + var(--dw-gap));
+    transform-style: preserve-3d;
+    transform: rotateY(var(--dw-col-turn, 0deg)) translateZ(var(--dw-col-depth, 0px));
+    transform-origin: 50% 50%;
   }
 
   .drift-wall__inner {
@@ -139,7 +142,7 @@
   }
 
   .drift-wall__overlay {
-    opacity: 0.08;
+    opacity: 0.04;
   }
 }
 
