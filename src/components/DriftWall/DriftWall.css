@@ -109,15 +109,16 @@
   box-shadow: 0 24px 60px -18px rgba(0, 0, 0, 0.7), 0 0 0 2px rgba(255, 255, 255, 0.9);
 }
 
-/* Mobile uses the actual responsive dimensions from DriftWall.jsx.
-   The columns form a shallow cylinder: center columns come forward and the
-   outer columns turn away. The wall is deliberately much taller than the
-   viewport so upward motion can never expose a blank lower half. */
+/* Mobile uses six larger columns with deliberate spacing. */
 @media (max-width: 767px) {
   .drift-wall {
     --dw-edge: 100%;
     --dw-dim: 0.9;
     --dw-perspective: 900px;
+    --dw-gap: 8px;
+    --dw-tile-w: clamp(56px, calc((100vw - 48px) / 6), 66px);
+    --dw-tile-h: calc(var(--dw-tile-w) * 0.69);
+    --dw-radius: 7px;
     -webkit-mask-image: none;
     mask-image: none;
   }
