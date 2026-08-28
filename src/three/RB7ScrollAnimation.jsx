@@ -14,6 +14,7 @@ const SIDE_CAMERA_Z = 0.7
 const SIDE_TARGET_X = 0
 const SIDE_TARGET_Y = 0.6
 const SIDE_TARGET_Z = 0.15
+const MOBILE_CAR_SCALE = 0.85
 
 const DRIVE_DISTANCE = 0.6
 const WHEEL_RADIUS = 0.30
@@ -73,7 +74,8 @@ export default function RB7ScrollAnimation({
       const width = window.innerWidth
       const height = window.innerHeight || 1
       const aspect = width / height
-      const fit = Math.min(1.55, Math.max(1, 0.72 / Math.max(aspect, 0.01)))
+      const baseFit = Math.min(1.55, Math.max(1, 0.72 / Math.max(aspect, 0.01)))
+      const fit = baseFit / MOBILE_CAR_SCALE
       camera.position.x = SIDE_CAMERA_X * fit
       camera.position.z = SIDE_CAMERA_Z * fit
       camera.fov = Math.min(58, 32 + (1 - Math.min(aspect, 1)) * 24)
@@ -85,9 +87,13 @@ export default function RB7ScrollAnimation({
 
     if (carZ.current !== 0) {
       const mobile = isMobileViewport()
-      const fit = mobile
-        ? Math.min(1.55, Math.max(1, 0.72 / Math.max(window.innerWidth / (window.innerHeight || 1), 0.01)))
+      const aspect = mobile
+        ? window.innerWidth / (window.innerHeight || 1)
         : 1
+      const baseFit = mobile
+        ? Math.min(1.55, Math.max(1, 0.72 / Math.max(aspect, 0.01)))
+        : 1
+      const fit = mobile ? baseFit / MOBILE_CAR_SCALE : 1
 
       camera.position.x = SIDE_CAMERA_X * fit
       camera.position.y = SIDE_CAMERA_Y
