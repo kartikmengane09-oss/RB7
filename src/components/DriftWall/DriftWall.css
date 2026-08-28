@@ -115,10 +115,10 @@
     --dw-edge: 100%;
     --dw-dim: 0.9;
     --dw-perspective: 900px;
-    --dw-gap: 8px;
-    --dw-tile-w: clamp(56px, calc((100vw - 48px) / 6), 66px);
+    --dw-gap: 14px;
+    --dw-tile-w: clamp(52px, calc((100vw - 84px) / 6), 62px);
     --dw-tile-h: calc(var(--dw-tile-w) * 0.69);
-    --dw-radius: 7px;
+    --dw-radius: 8px;
     -webkit-mask-image: none;
     mask-image: none;
   }
@@ -144,6 +144,13 @@
 
   .drift-wall__overlay {
     opacity: 0.04;
+  }
+}
+
+@media (max-width: 390px) {
+  .drift-wall {
+    --dw-gap: 11px;
+    --dw-tile-w: clamp(48px, calc((100vw - 66px) / 6), 56px);
   }
 }
 
