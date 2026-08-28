@@ -1,0 +1,123 @@
+.drift-wall {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  perspective: var(--wall-perspective);
+  isolation: isolate;
+}
+
+.drift-wall::before {
+  content: '';
+  position: absolute;
+  inset: -20%;
+  z-index: 2;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 35%, rgba(0, 0, 0, calc(var(--tile-fade) * .65)) 100%);
+}
+
+.drift-wall__stage {
+  position: absolute;
+  inset: -28%;
+  display: flex;
+  justify-content: center;
+  gap: var(--tile-gap);
+  transform-style: preserve-3d;
+  transform: translateZ(calc(var(--wall-depth) * -1)) rotateX(calc(var(--wall-tilt) + var(--pointer-y))) rotateY(calc(var(--wall-turn) + var(--pointer-x))) rotateZ(var(--wall-roll));
+}
+
+.drift-wall__column {
+  position: relative;
+  flex: 0 0 var(--tile-width);
+  display: flex;
+  flex-direction: column;
+  gap: var(--tile-gap);
+  transform: translate3d(0, var(--drift-offset, 0px), 0);
+  will-change: transform;
+}
+
+.drift-wall__link {
+  display: block;
+  flex: 0 0 auto;
+  color: inherit;
+  text-decoration: none;
+}
+
+.drift-wall__tile {
+  position: relative;
+  width: var(--tile-width);
+  height: var(--tile-height);
+  overflow: hidden;
+  border-radius: var(--tile-radius);
+  background: #111;
+  opacity: var(--tile-dim);
+  filter: grayscale(calc(var(--tile-grayscale) * 1));
+  transform: translateZ(0);
+  transition: opacity .35s ease, transform .45s cubic-bezier(.2,.8,.2,1), filter .35s ease;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, .3);
+}
+
+.drift-wall__tile img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+}
+
+.drift-wall__overlay {
+  position: absolute;
+  inset: 0;
+  background: var(--overlay-color);
+  opacity: .45;
+  mix-blend-mode: multiply;
+  transition: opacity .35s ease;
+}
+
+.drift-wall__title {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  z-index: 1;
+  font-family: 'Barlow Condensed', Impact, sans-serif;
+  font-size: .85rem;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .88);
+}
+
+.drift-wall__tile.is-hovered {
+  opacity: 1;
+  filter: grayscale(0);
+  transform: translateZ(var(--tile-lift));
+  box-shadow: 0 34px 80px rgba(0, 0, 0, .55);
+}
+
+.drift-wall__tile.is-hovered .drift-wall__overlay {
+  opacity: 0;
+}
+
+@media (max-width: 760px) {
+  .drift-wall__stage {
+    inset: -45%;
+    gap: 12px;
+  }
+
+  .drift-wall__column {
+    flex-basis: 150px;
+    gap: 12px;
+  }
+
+  .drift-wall__tile {
+    width: 150px;
+    height: 100px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drift-wall__tile {
+    transition: none;
+  }
+}
