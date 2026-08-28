@@ -27,11 +27,6 @@ const VIEWPORT_GUTTER = 32
 const RACE_TRANSITION_START = FINAL_SECTION_END
 const RACE_RECORD_HOLD_START = RACE_TRANSITION_START + RACE_TRANSITION_DURATION
 const GALLERY_ENTRANCE_START = RACE_RECORD_HOLD_START + RACE_RECORD_HOLD_DURATION
-const DESKTOP_SIDE_DISTANCE = Math.hypot(5.27, 0.83)
-const DESKTOP_SIDE_SCALE = DESKTOP_SIDE_DISTANCE / Math.hypot(SIDE_CAMERA_X, SIDE_CAMERA_Z)
-const DESKTOP_SIDE_X = SIDE_CAMERA_X * DESKTOP_SIDE_SCALE
-const DESKTOP_SIDE_Z = SIDE_CAMERA_Z * DESKTOP_SIDE_SCALE
-const DESKTOP_MID_Z = Math.sqrt(Math.max(0, DESKTOP_SIDE_DISTANCE ** 2 - 2.7 ** 2 - 1.05 ** 2))
 
 const isMobileViewport = () => typeof window !== 'undefined' && window.innerWidth <= 767
 
@@ -42,6 +37,16 @@ const getMobileSideCamera = () => {
   const fit = baseFit / MOBILE_CAR_SCALE
   const fov = Math.min(58, 32 + (1 - Math.min(aspect, 1)) * 24)
   return { x: SIDE_CAMERA_X * fit, y: SIDE_CAMERA_Y, z: SIDE_CAMERA_Z * fit, fov }
+}
+
+// Desktop uses a fixed camera distance. The camera moves around the car
+// instead of moving closer/farther away, so scroll changes the angle but
+// does not create a zoom-in/zoom-out effect.
+const DESKTOP_CAMERA_DISTANCE = Math.hypot(0, 0.83, 5.27)
+const getDesktopCamera = (x, y, z) => {
+  const length = Math.hypot(x, y, z) || 1
+  const scale = DESKTOP_CAMERA_DISTANCE / length
+  return { x: x * scale, y: y * scale, z: z * scale, fov: 32 }
 }
 
 export default function RB7ScrollAnimation({ rb7Ref, heroUiRef, technicalLeftRef, technicalRightRef, raceRecordRef, driftWallRef }) {
@@ -60,9 +65,18 @@ export default function RB7ScrollAnimation({ rb7Ref, heroUiRef, technicalLeftRef
     const model = rb7Ref?.current
     if (!model) return
     if (model.group) model.group.position.z = 0
+
     const wheelPivots = model.wheelPivots
-    if (wheelPivots) Object.values(wheelPivots).forEach((wheelData) => { if (wheelData?.pivot) wheelData.pivot.rotation.x = wheelSpin.current })
-    if (carZ.current !== 0) Object.assign(target.current, { x: SIDE_TARGET_X, y: SIDE_TARGET_Y, z: SIDE_TARGET_Z })
+    if (wheelPivots) Object.values(wheelPivots).forEach((wheelData) => {
+      if (wheelData?.pivot) wheelData.pivot.rotation.x = wheelSpin.current
+    })
+
+    if (carZ.current !== 0) Object.assign(target.current, {
+      x: SIDE_TARGET_X,
+      y: SIDE_TARGET_Y,
+      z: SIDE_TARGET_Z,
+    })
+
     targetVector.current.set(target.current.x, target.current.y, target.current.z)
     camera.lookAt(targetVector.current)
   })
@@ -88,17 +102,37 @@ export default function RB7ScrollAnimation({ rb7Ref, heroUiRef, technicalLeftRef
       const driftWall = driftWallRef?.current
       const driftWallColumns = driftWall ? Array.from(driftWall.querySelectorAll('.drift-wall__col')) : []
       const mobile = isMobileViewport()
+
       const technicalStoryStartX = mobile ? 0 : 300
       const technicalHighlightsStartX = mobile ? 0 : 900
+
       const mobileSideCamera = getMobileSideCamera()
-      const sideCamera = mobile ? mobileSideCamera : { x: DESKTOP_SIDE_X, y: SIDE_CAMERA_Y, z: DESKTOP_SIDE_Z, fov: 32 }
+      const desktopSideCamera = getDesktopCamera(SIDE_CAMERA_X, SIDE_CAMERA_Y, SIDE_CAMERA_Z)
+      const sideCamera = mobile ? mobileSideCamera : desktopSideCamera
+
+      // Desktop mid camera is normalized to the exact same distance as the
+      // initial camera. Mobile keeps its independently responsive path.
+      const desktopMidCamera = getDesktopCamera(2.7, 1.05, 2.75)
+      const heroCamera = mobile
+        ? { x: 0, y: 0.82, z: 4.55 }
+        : { x: 0, y: 0.83, z: 5.27 }
+      const midCamera = mobile ? { x: 2.7, y: 1.05, z: 2.75 } : desktopMidCamera
 
       if (heroUi) gsap.set(heroUi, { autoAlpha: 1 })
       if (technicalLeft) gsap.set(technicalLeft, { autoAlpha: 0, x: technicalStoryStartX })
-      if (technicalRight) gsap.set(technicalRight, { autoAlpha: 0, x: technicalHighlightsStartX, y: mobile ? 0 : -300 })
-      if (raceRecord) gsap.set(raceRecord, { autoAlpha: 1, x: () => -raceRecord.getBoundingClientRect().right - VIEWPORT_GUTTER })
+      if (technicalRight) gsap.set(technicalRight, {
+        autoAlpha: 0,
+        x: technicalHighlightsStartX,
+        y: mobile ? 0 : -300,
+      })
+      if (raceRecord) gsap.set(raceRecord, {
+        autoAlpha: 1,
+        x: () => -raceRecord.getBoundingClientRect().right - VIEWPORT_GUTTER,
+      })
       if (driftWall) gsap.set(driftWall, { xPercent: 0 })
-      if (driftWallColumns.length) gsap.set(driftWallColumns, { yPercent: (index) => index % 2 === 0 ? 130 : -130 })
+      if (driftWallColumns.length) gsap.set(driftWallColumns, {
+        yPercent: (index) => index % 2 === 0 ? 130 : -130,
+      })
 
       const exitRight = (element) => {
         const rect = element.getBoundingClientRect()
@@ -106,53 +140,132 @@ export default function RB7ScrollAnimation({ rb7Ref, heroUiRef, technicalLeftRef
         return currentX + window.innerWidth - rect.left + VIEWPORT_GUTTER
       }
 
-      const timeline = gsap.timeline({ scrollTrigger: { trigger: '.experience-page', start: 'top top', end: '+=1385%', pin: true, scrub: 1, invalidateOnRefresh: true }, defaults: { ease: 'none' } })
+      const timeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: '.experience-page',
+          start: 'top top',
+          end: '+=1385%',
+          pin: true,
+          scrub: 1,
+          invalidateOnRefresh: true,
+        },
+        defaults: { ease: 'none' },
+      })
 
-      // Desktop keeps a constant camera distance during the scroll so the
-      // RB7 does not visually zoom in/out. Mobile retains its approved
-      // responsive camera path below through the shared sideCamera values.
-      const desktopHeroZ = mobile ? 4.55 : 5.27
-      const desktopMidZ = mobile ? 2.75 : DESKTOP_MID_Z
-      const heroCameraX = 0
-      const heroCameraY = 0.82
-      const midCameraX = 2.7
-      const midCameraY = 1.05
-
-      timeline.to(camera.position, { x: heroCameraX, y: heroCameraY, z: desktopHeroZ, duration: 0.20 }, 0)
+      // Desktop: constant-distance camera path. Mobile: retain the approved
+      // responsive camera path, including the 15% smaller-car framing.
+      timeline.to(camera.position, { ...heroCamera, duration: 0.20 }, 0)
       timeline.to(target.current, { x: 0, y: 0.10, z: 0.60, duration: 0.20 }, 0)
-      timeline.to(camera.position, { x: midCameraX, y: midCameraY, z: desktopMidZ, duration: 0.25 }, 0.20)
+
+      timeline.to(camera.position, {
+        ...midCamera,
+        duration: 0.25,
+      }, 0.20)
       timeline.to(target.current, { x: 0, y: 0.24, z: 0.40, duration: 0.25 }, 0.20)
-      timeline.to(camera.position, { x: sideCamera.x, y: sideCamera.y, z: sideCamera.z, duration: 0.30, ease: 'power2.inOut' }, 0.45)
-      timeline.to(camera, { fov: sideCamera.fov, duration: 0.30, ease: 'power2.inOut', onUpdate: () => camera.updateProjectionMatrix() }, 0.45)
-      timeline.to(target.current, { x: SIDE_TARGET_X, y: SIDE_TARGET_Y, z: SIDE_TARGET_Z, duration: 0.30, ease: 'power2.inOut' }, 0.45)
-      timeline.to(camera.position, { x: sideCamera.x, y: sideCamera.y, z: sideCamera.z, duration: 0.13, ease: 'sine.inOut' }, 0.75)
-      timeline.to(camera, { fov: sideCamera.fov, duration: 0.13, ease: 'sine.inOut', onUpdate: () => camera.updateProjectionMatrix() }, 0.75)
-      timeline.to(target.current, { x: SIDE_TARGET_X, y: SIDE_TARGET_Y, z: SIDE_TARGET_Z, duration: 0.13, ease: 'sine.inOut' }, 0.75)
+
+      timeline.to(camera.position, {
+        x: sideCamera.x,
+        y: sideCamera.y,
+        z: sideCamera.z,
+        duration: 0.30,
+        ease: 'power2.inOut',
+      }, 0.45)
+      timeline.to(camera, {
+        fov: sideCamera.fov,
+        duration: 0.30,
+        ease: 'power2.inOut',
+        onUpdate: () => camera.updateProjectionMatrix(),
+      }, 0.45)
+      timeline.to(target.current, {
+        x: SIDE_TARGET_X,
+        y: SIDE_TARGET_Y,
+        z: SIDE_TARGET_Z,
+        duration: 0.30,
+        ease: 'power2.inOut',
+      }, 0.45)
+
+      timeline.to(camera.position, {
+        x: sideCamera.x,
+        y: sideCamera.y,
+        z: sideCamera.z,
+        duration: 0.13,
+        ease: 'sine.inOut',
+      }, 0.75)
+      timeline.to(camera, {
+        fov: sideCamera.fov,
+        duration: 0.13,
+        ease: 'sine.inOut',
+        onUpdate: () => camera.updateProjectionMatrix(),
+      }, 0.75)
+      timeline.to(target.current, {
+        x: SIDE_TARGET_X,
+        y: SIDE_TARGET_Y,
+        z: SIDE_TARGET_Z,
+        duration: 0.13,
+        ease: 'sine.inOut',
+      }, 0.75)
 
       if (heroUi) timeline.to(heroUi, { autoAlpha: 0, duration: 0.12, ease: 'power2.out' }, 0.76)
       if (technicalLeft) timeline.to(technicalLeft, { autoAlpha: 1, x: 0, duration: 0.2, ease: 'power2.out' }, 0.88)
       if (technicalRight) timeline.to(technicalRight, { autoAlpha: 1, x: 0, y: 0, duration: 0.2, ease: 'power2.out' }, 0.90)
-      timeline.to(camera.position, { x: sideCamera.x, y: sideCamera.y, z: sideCamera.z, duration: 0.06 }, 0.90)
-      timeline.to(target.current, { x: SIDE_TARGET_X, y: SIDE_TARGET_Y, z: SIDE_TARGET_Z, duration: 0.06 }, 0.90)
-      timeline.to(camera.position, { x: sideCamera.x, y: sideCamera.y, z: sideCamera.z, duration: DRIVE_DURATION }, DRIVE_START)
-      timeline.to(target.current, { x: SIDE_TARGET_X, y: SIDE_TARGET_Y, z: SIDE_TARGET_Z, duration: DRIVE_DURATION }, DRIVE_START)
 
-      if (technicalLeft) timeline.to(technicalLeft, { x: () => exitRight(technicalLeft), autoAlpha: 0, duration: RACE_TRANSITION_DURATION }, RACE_TRANSITION_START)
-      if (technicalRight) timeline.to(technicalRight, { x: () => exitRight(technicalRight), autoAlpha: 0, duration: RACE_TRANSITION_DURATION }, RACE_TRANSITION_START)
+      timeline.to(camera.position, {
+        x: sideCamera.x,
+        y: sideCamera.y,
+        z: sideCamera.z,
+        duration: 0.06,
+      }, 0.90)
+      timeline.to(target.current, {
+        x: SIDE_TARGET_X,
+        y: SIDE_TARGET_Y,
+        z: SIDE_TARGET_Z,
+        duration: 0.06,
+      }, 0.90)
+
+      timeline.to(camera.position, {
+        x: sideCamera.x,
+        y: sideCamera.y,
+        z: sideCamera.z,
+        duration: DRIVE_DURATION,
+      }, DRIVE_START)
+      timeline.to(target.current, {
+        x: SIDE_TARGET_X,
+        y: SIDE_TARGET_Y,
+        z: SIDE_TARGET_Z,
+        duration: DRIVE_DURATION,
+      }, DRIVE_START)
+
+      if (technicalLeft) timeline.to(technicalLeft, {
+        x: () => exitRight(technicalLeft),
+        autoAlpha: 0,
+        duration: RACE_TRANSITION_DURATION,
+      }, RACE_TRANSITION_START)
+      if (technicalRight) timeline.to(technicalRight, {
+        x: () => exitRight(technicalRight),
+        autoAlpha: 0,
+        duration: RACE_TRANSITION_DURATION,
+      }, RACE_TRANSITION_START)
       if (raceRecord) timeline.to(raceRecord, { x: 0, duration: RACE_TRANSITION_DURATION }, RACE_TRANSITION_START)
-      if (driftWallColumns.length) timeline.to(driftWallColumns, { yPercent: 0, duration: GALLERY_ENTRANCE_DURATION, ease: 'power3.out' }, GALLERY_ENTRANCE_START)
+      if (driftWallColumns.length) timeline.to(driftWallColumns, {
+        yPercent: 0,
+        duration: GALLERY_ENTRANCE_DURATION,
+        ease: 'power3.out',
+      }, GALLERY_ENTRANCE_START)
       if (raceRecord) timeline.to(raceRecord, { x: 0, duration: RACE_RECORD_HOLD_DURATION }, RACE_RECORD_HOLD_START)
 
       const updateDriving = () => {
         const timelineTime = timeline.time()
         if (timelineTime >= RACE_TRANSITION_START) {
-          const transitionProgress = Math.min(1, Math.max(0, (timelineTime - RACE_TRANSITION_START) / RACE_TRANSITION_DURATION))
+          const transitionProgress = Math.min(1, Math.max(0,
+            (timelineTime - RACE_TRANSITION_START) / RACE_TRANSITION_DURATION
+          ))
           carZ.current = -DRIVE_DISTANCE * transitionProgress
           if (model?.position) model.position.z = initialCarZ.current + carZ.current
           wheelSpin.current = transitionWheelSpin.current + (-carZ.current / WHEEL_RADIUS)
           lastTimelineTime.current = timelineTime
           return
         }
+
         if (timelineTime < DRIVE_START) {
           driveProgress.current = 0
           carZ.current = 0
@@ -160,11 +273,15 @@ export default function RB7ScrollAnimation({ rb7Ref, heroUiRef, technicalLeftRef
           lastTimelineTime.current = timelineTime
           return
         }
+
         const timelineDelta = timelineTime - lastTimelineTime.current
         wheelSpin.current += timelineDelta * WHEEL_SPIN_SPEED
         transitionWheelSpin.current = wheelSpin.current
         lastTimelineTime.current = timelineTime
-        const currentProgress = Math.min(1, Math.max(0, (timelineTime - DRIVE_START) / DRIVE_DURATION))
+
+        const currentProgress = Math.min(1, Math.max(0,
+          (timelineTime - DRIVE_START) / DRIVE_DURATION
+        ))
         driveProgress.current = currentProgress
         carZ.current = -DRIVE_DISTANCE * currentProgress
         if (model?.position) model.position.z = initialCarZ.current + carZ.current
