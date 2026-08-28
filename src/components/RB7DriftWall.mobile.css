@@ -27,91 +27,70 @@
 
 @media (max-width: 767px) {
   .drift-wall-stage .drift-wall {
-    /* 9 columns stay visible across the phone. The slightly wider tiles
-       leave enough visual weight for the cylindrical perspective. */
-    --dw-tile-w: clamp(42px, 12.4vw, 50px) !important;
-    --dw-tile-h: clamp(29px, 8.2vw, 34px) !important;
-    --dw-gap: clamp(3px, 1vw, 4px) !important;
-    --dw-radius: 5px !important;
-    --dw-perspective: 780px !important;
+    /* Six columns now fill the phone width instead of being squeezed into
+       the center. At 430px this gives roughly 68px tiles + 3px gaps. */
+    --dw-tile-w: clamp(58px, 15.8vw, 68px) !important;
+    --dw-tile-h: clamp(39px, 10.8vw, 47px) !important;
+    --dw-gap: 3px !important;
+    --dw-radius: 6px !important;
+    --dw-perspective: 760px !important;
     --dw-lift: 24px !important;
     --dw-edge: 0% !important;
-
-    /* The stock DriftWall mask fades the lower portion of the plane. On a
-       portrait gallery that makes the bottom half look empty, so let the
-       image wall occupy the complete viewport. */
     -webkit-mask-image: none !important;
     mask-image: none !important;
   }
 
-  /* True shallow-cylinder treatment: the center column faces forward while
-     the columns progressively turn and recede toward both edges. */
+  /* Six-column shallow cylinder: center pair faces forward and the outer
+     pairs turn away, while the total footprint stays close to 100vw. */
   .drift-wall-stage .drift-wall__col {
     transform-style: preserve-3d;
     transform-origin: 50% 50%;
   }
 
   .drift-wall-stage .drift-wall__col:nth-child(1) {
-    transform: rotateY(-22deg) translateZ(-42px) !important;
+    transform: rotateY(-18deg) translateZ(-36px) !important;
   }
-
   .drift-wall-stage .drift-wall__col:nth-child(2) {
-    transform: rotateY(-16deg) translateZ(-27px) !important;
+    transform: rotateY(-9deg) translateZ(-14px) !important;
   }
-
   .drift-wall-stage .drift-wall__col:nth-child(3) {
-    transform: rotateY(-10deg) translateZ(-15px) !important;
+    transform: rotateY(-3deg) translateZ(-3px) !important;
   }
-
   .drift-wall-stage .drift-wall__col:nth-child(4) {
-    transform: rotateY(-5deg) translateZ(-5px) !important;
+    transform: rotateY(3deg) translateZ(-3px) !important;
   }
-
   .drift-wall-stage .drift-wall__col:nth-child(5) {
-    transform: rotateY(0deg) translateZ(0) !important;
+    transform: rotateY(9deg) translateZ(-14px) !important;
   }
-
   .drift-wall-stage .drift-wall__col:nth-child(6) {
-    transform: rotateY(5deg) translateZ(-5px) !important;
+    transform: rotateY(18deg) translateZ(-36px) !important;
   }
 
-  .drift-wall-stage .drift-wall__col:nth-child(7) {
-    transform: rotateY(10deg) translateZ(-15px) !important;
-  }
-
-  .drift-wall-stage .drift-wall__col:nth-child(8) {
-    transform: rotateY(16deg) translateZ(-27px) !important;
-  }
-
-  .drift-wall-stage .drift-wall__col:nth-child(9) {
-    transform: rotateY(22deg) translateZ(-42px) !important;
-  }
-
-  /* Give the wall extra vertical coverage so the moving tracks extend beyond
-     both the top and bottom edges of a portrait phone. */
+  /* Do not scale the plane horizontally: the six responsive columns are
+     already sized to the viewport. Keep extra vertical coverage only. */
   .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1.18, 1.45) translateZ(-55px) !important;
+    transform: translate(-50%, -50%) scale(1, 1.35) translateZ(-35px) !important;
   }
 
   .drift-wall-stage .drift-wall__inner {
-    opacity: 0.94;
+    opacity: 1;
   }
 
   .drift-wall-stage .drift-wall__overlay {
-    opacity: 0.16;
+    opacity: 0.08;
   }
 }
 
 @media (max-width: 390px) {
   .drift-wall-stage .drift-wall {
-    --dw-tile-w: 42px !important;
-    --dw-tile-h: 29px !important;
+    --dw-tile-w: clamp(55px, 15.8vw, 62px) !important;
+    --dw-tile-h: clamp(37px, 10.8vw, 43px) !important;
     --dw-gap: 3px !important;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .drift-wall-stage .drift-wall__plane {
-    transform: translate(-50%, -50%) scale(1.18, 1.45) translateZ(-55px) !important;
+    transform: translate(-50%, -50%) scale(1, 1.35) translateZ(-35px) !important;
   }
 }
